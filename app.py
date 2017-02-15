@@ -4,13 +4,12 @@
 # 
 # from flask_restful import Resource, Api, reqparse
 # from pymongo import MongoClient
-from flask import Flask 
-from flask import render_template, json
+from flask import Flask, send_file, json
 import geoip2.database
 
 
-reader = geoip2.database.Reader('GeoLite2-City.mmdb')
-file = open('ip_auth_uniq.txt', "r")
+reader = geoip2.database.Reader('res/GeoLite2-City.mmdb')
+file = open('res/ip_auth_uniq.txt', "r")
 
 response = []
 profiles = []
@@ -57,16 +56,13 @@ for ip in file:
 
 file.close()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_file('templates/index.html')
 
-@app.route('/map')
-def showMap():
-    return render_template("map.html")
-    
+
 @app.route('/getprofiles', methods=['GET'])
 def getIP():
     try:

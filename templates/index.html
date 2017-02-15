@@ -9,139 +9,38 @@
 
     <title>VPS - GeoIP</title>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCktMMX39icwllipmYDMPHXQRFrtgzFXK8&callback=initMap"
-    async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCktMMX39icwllipmYDMPHXQRFrtgzFXK8&callback=initMap" async defer></script>
 
-    <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    
-    <script src="static/js/jquery.min.js"></script>
-
-    <script src="static/js/lodash.min.js"></script>
+    <link href="static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="static/lib/jquery/jquery.min.js"></script>
+    <script src="static/lib/lodash.min.js"></script>
     
     <!-- DataTables  -->
-    <script src="static/datatable/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/datatable/jquery.dataTables.min.css">
+    <script src="static/lib/datatable/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/lib/datatable/jquery.dataTables.min.css">
 
-    <script src="static/js/angular.js"></script>
-    <script src="static/js/angular-simple-logger.js"></script>
-    <script src="static/js/angular-google-maps.min.js"></script>   
+    <!-- AngularJS -->
+    <script src="static/lib/angularjs/angular.js"></script>
+    <script src="static/lib/angularjs/angular-simple-logger.js"></script>
+    <script src="static/lib/angularjs/angular-google-maps.min.js"></script>   
+    <script src="static/lib/angularjs/angular-ui-router.js"></script>   
+    
+    <!-- Angular Datatables -->
+    <script src="static/lib/angular-datatables/angular-datatables.js"></script>
+    <link rel="stylesheet" href="static/lib/angular-datatables/angular-datatables.css">
 
-    <!-- <script src="static/angular-datatable/angular-datatables.module.js"></script>
-    <script src="static/angular-datatable/angular-datatables.directive.js"></script> -->
-    <script src="static/js/angular-datatables.js"></script>
-    <link rel="stylesheet" href="static/js/angular-datatables.css">
+
+    <script src="static/js/app.js"></script>
+    <script src="static/js/controllers/HomeController.js"></script>
+    <script src="static/js/controllers/MapController.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
 
 </head>
-<body ng-app="myApp" ng-controller="HomeCtrl">
+<body ng-app="myApp">
 
-    <style>
-        .angular-google-map-container { height: 400px; }
-    </style>
-
-    <!-- <script>
-        $(document).ready(function(){
-            $('#myTable').DataTable();
-        });
-    </script> -->
-    <script>
-        angular.module('myApp', ['uiGmapgoogle-maps', 'datatables'])
-
-        .config(function(uiGmapGoogleMapApiProvider) {
-            uiGmapGoogleMapApiProvider.configure({
-                key: 'AIzaSyCktMMX39icwllipmYDMPHXQRFrtgzFXK8',
-                v: '3.20', //defaults to latest 3.X anyhow
-                libraries: 'weather,geometry,visualization'
-            });
-        })
-
-        .controller('HomeCtrl', function($scope, $http){
-            $scope.title='VPS - GeoIP';
-            $scope.profiles = [];
-
-            $scope.map = {
-              center: {
-                latitude: 40.1451,
-                longitude: -99.6680
-              },
-              zoom: 2
-              // bounds: {
-              //   northeast: {
-              //     latitude: 45.1451,
-              //     longitude: -80.6680
-              //   },
-              //   southwest: {
-              //     latitude: 30.000,
-              //     longitude: -120.6680
-              //   }
-              // }
-            };
-            $scope.options = {
-              scrollwheel: false
-            };
-            // var createRandomMarker = function(i, bounds, idKey) {
-            //     var lat_min = bounds.southwest.latitude,
-            //         lat_range = bounds.northeast.latitude - lat_min,
-            //         lng_min = bounds.southwest.longitude,
-            //         lng_range = bounds.northeast.longitude - lng_min;
-
-            //       if (idKey == null) {
-            //         idKey = "id";
-            //       }
-
-            //     var latitude = lat_min + (Math.random() * lat_range);
-            //     var longitude = lng_min + (Math.random() * lng_range);
-            //     var ret = {
-            //         latitude: latitude,
-            //         longitude: longitude,
-            //         title: 'm' + i
-            //     };
-            //     ret[idKey] = i;
-            //     return ret;
-            // };
-            // var markers = [];
-            for (var i = 0; i < $scope.profiles.length-1; i++) {
-                var ret = {
-                    latitude: $scope.profiles[i].latitude,
-                    longitude: $scope.profiles[i].longitude
-                }
-                ret[idKey] = i
-                $scope.randomMarkers.append(ret);
-
-              // markers.push(createRandomMarker(i, $scope.map.bounds))
-            }
-            
-            // $scope.randomMarkers = markers;
-
-            $scope.getIP = function(){
-                $http.get('/getprofiles').then(function(response){
-                    $scope.profiles = response.data;
-                    console.log('fetched profiles')
-                }, function(err){
-                    console.log(err);
-                })
-            }
-
-            $scope.createMarkers = function(){
-                for (var i = 0; i < ($scope.profiles.length) - 1; i++){
-
-                    var ret = {
-                        latitude: $scope.profiles[i].latitude,
-                        longitude: $scope.profiles[i].longitude
-                    }
-                    console.log(JSON.stringify(ret, null, 2))
-                    $scope.markers.append(ret);
-
-                } 
-            }
-
-            $scope.getIP();
-            $scope.createMarkers();
-        })
-    </script>
-    
-
-        
-    <ui-gmap-google-map center='map.center' zoom='map.zoom'>
+    <div class="ui-view"></div>
+<!--     <ui-gmap-google-map center='map.center' zoom='map.zoom'>
         <ui-gmap-markers models="randomMarkers" coords="'self'" icon="'icon'">
         </ui-gmap-markers>
     </ui-gmap-google-map>
@@ -179,10 +78,10 @@
                 </div>
         </div>
     </div>
-
+ -->
     
 
-    <script src="static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="static/lib/bootstrap/js/bootstrap.min.js"></script>
 
 </body>
 </html>

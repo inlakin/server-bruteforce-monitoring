@@ -4,7 +4,7 @@
 # 
 # from flask_restful import Resource, Api, reqparse
 # from pymongo import MongoClient
-from flask import Flask, send_file, json
+from flask import Flask, send_file, json, request
 import geoip2.database
 
 
@@ -61,6 +61,14 @@ app = Flask(__name__, static_url_path='/static')
 @app.route('/')
 def index():
     return send_file('templates/index.html')
+
+@app.route('/ssh', methods=['POST'])
+def ssh():
+    data = json.loads(request.data.decode())
+    print data['user']
+    print data['password']
+    print data['hostname']
+    print data['port']
 
 
 @app.route('/getprofiles', methods=['GET'])

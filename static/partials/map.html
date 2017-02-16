@@ -1,12 +1,5 @@
-<!-- <h1>About</h1>
-
-<p>Hmm, not much here.</p>
-<p>Best get back to the <a ui-sref="home">home page</a>.</p>
-
-<p>Tip: going to an incorrect URL will take you to the homepage, <a href="/#/404">Try it!</a></p> -->
-
 <ui-gmap-google-map center='map.center' zoom='map.zoom'>
-    <ui-gmap-markers models="randomMarkers" coords="'self'" icon="'icon'">
+    <ui-gmap-markers models="markers" coords="'self'" icon="'icon'">
     </ui-gmap-markers>
 </ui-gmap-google-map>
     
@@ -30,8 +23,8 @@
                 <tbody>
                     <tr ng-repeat="p in profiles track by $index">
                         <th scope="row">{{$index+1}}</th>
-                        <td>{{p.ip}}}</td>
-                        <td>{{p.country}}}</td>
+                        <td>{{p.ip}}</td>
+                        <td>{{p.country}}</td>
                         <td>{{p.city}}</td>
                         <td>{{p.postal_code}}</td>
                         <td>{{p.latitude}}</td>

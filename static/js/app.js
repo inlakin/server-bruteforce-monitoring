@@ -7,7 +7,8 @@
 angular.module('myApp', [
     'uiGmapgoogle-maps', 
     'datatables',
-    'ui.router'
+    'ui.router',
+    'myApp.ProfilesService'
 ])
 
 .config(function(uiGmapGoogleMapApiProvider) {

@@ -6,55 +6,13 @@
 # from pymongo import MongoClient
 from flask import Flask, send_file, json, request
 import geoip2.database
+import paramiko
 
 
 reader = geoip2.database.Reader('res/GeoLite2-City.mmdb')
-file = open('res/ip_auth_uniq.txt', "r")
 
 response = []
 profiles = []
-
-nb_ip    = 0
-
-for ip in file:
-    r     = {}
-    nb_ip += 1
-
-    if ip[0] == "0":
-        print "Debut d'ip"
-        print ip
-        print ip[1:]
-        try:
-            response         = reader.city(ip[1:].strip('\n'))
-
-            r['ip']          = ip[1:].strip('\n')
-            r['country']     = response.country.name
-            r['city']        = response.city.name
-            r['postal_code'] = response.postal.code
-            r['latitude']    = response.location.latitude
-            r['longitude']   = response.location.longitude
-
-            profiles.append(r) 
-
-        except Exception, e:
-            print str(e)
-    else:
-        try:
-            response         = reader.city(ip.strip('\n'))
-
-            r['ip']          = ip.strip('\n')
-            r['country']     = response.country.name
-            r['city']        = response.city.name
-            r['postal_code'] = response.postal.code
-            r['latitude']    = response.location.latitude
-            r['longitude']   = response.location.longitude
-
-            profiles.append(r)
-
-        except Exception, e:
-            print str(e)
-
-file.close()
 
 app = Flask(__name__, static_url_path='/static')
 
@@ -64,19 +22,68 @@ def index():
 
 @app.route('/ssh', methods=['POST'])
 def ssh():
-    data = json.loads(request.data.decode())
-    print data['user']
-    print data['password']
-    print data['hostname']
-    print data['port']
 
+    data     = json.loads(request.data.decode())
+    
+    username = data['user']
+    password = data['password']
+    hostname = data['hostname']
+    port     = data['port']
+    nb_ip = 0
+    print username + "@" + hostname + ":" + str(port)
 
-@app.route('/getprofiles', methods=['GET'])
-def getIP():
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        return json.dumps(profiles)
-    except Exception, e:
-        return str(e)
+            ssh.connect(hostname, username=username, password=password, port=port)
+    except paramiko.SSHException:
+            print "Connection Failed"
+            quit()
+     
+    stdin,stdout,stderr = ssh.exec_command("zgrep 'Failed password for' /var/log/auth.log* | grep -Po '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | sort | uniq")
+     
+    for ip in stdout.readlines():
+            # print line.strip()
+            r     = {}
+            nb_ip += 1
+
+            if ip[0] == "0":
+                print "Debut d'ip"
+                print ip
+                print ip[1:]
+                try:
+                    response         = reader.city(ip[1:].strip('\n'))
+
+                    r['ip']          = ip[1:].strip('\n')
+                    r['country']     = response.country.name
+                    r['city']        = response.city.name
+                    r['postal_code'] = response.postal.code
+                    r['latitude']    = response.location.latitude
+                    r['longitude']   = response.location.longitude
+
+                    profiles.append(r) 
+
+                except Exception, e:
+                    print str(e)
+            else:
+                try:
+                    response         = reader.city(ip.strip('\n'))
+
+                    r['ip']          = ip.strip('\n')
+                    r['country']     = response.country.name
+                    r['city']        = response.city.name
+                    r['postal_code'] = response.postal.code
+                    r['latitude']    = response.location.latitude
+                    r['longitude']   = response.location.longitude
+
+                    profiles.append(r)
+
+                except Exception, e:
+                    print str(e)
+    ssh.close()
+
+    return json.dumps(profiles)
+
 
 if __name__=='__main__':
     app.run(debug=True)

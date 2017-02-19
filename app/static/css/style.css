@@ -1,0 +1,10 @@
+body{
+    padding-top: 70px;
+}
+
+.angular-google-map-container { height: 400px; }
+
+.register{
+    width: 30%;
+    margin:auto;
+}

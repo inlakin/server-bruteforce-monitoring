@@ -32,6 +32,7 @@
 
     <script src="static/js/app.js"></script>
     <script src="static/js/controllers/HomeController.js"></script>
+    <script src="static/js/controllers/AuthController.js"></script>
     <script src="static/js/controllers/MapController.js"></script>
     <script src="static/js/services/ProfilesService.js"></script>
 
@@ -39,6 +40,26 @@
 </head>
 <body ng-app="myApp">
 
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        
+      <div class="navbar-hedaer">
+          <div class="navbar-brand">Server Monitoring</div>
+      </div>
+        <ul class="nav navbar-nav">
+            <li><a ui-sref="home">Home</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a ui-sref="map">Map</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a ui-sref="login">Login</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a ui-sref="register">Register</a></li>
+        </ul>
+      </div>
+    </div>
+    </nav>
+    
     <div class="ui-view"></div>
   
 

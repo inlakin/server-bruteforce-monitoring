@@ -8,7 +8,8 @@ angular.module('myApp', [
     'uiGmapgoogle-maps', 
     'datatables',
     'ui.router',
-    'myApp.ProfilesService'
+    'myApp.ProfilesService',
+    'myApp.Authentication'
 ])
 
 .config(function(uiGmapGoogleMapApiProvider) {
@@ -30,6 +31,16 @@ angular.module('myApp', [
             url:'/map',
             templateUrl:'/static/partials/map.html',
             controller:'MapCtrl'
+        })
+        .state('login', {
+            url:'/login',
+            templateUrl:'/static/partials/login.html',
+            controller:'AuthCtrl'
+        })
+        .state('register', {
+            url:'/register',
+            templateUrl:'/static/partials/register.html',
+            controller:'AuthCtrl'
         })
 
     $urlRouterProvider.otherwise('/');

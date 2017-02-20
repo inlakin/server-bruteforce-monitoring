@@ -2,8 +2,11 @@ from app import app, lm
 from flask import send_file, request, redirect, render_template, url_for, flash, json
 from flask_login import login_user, logout_user, login_required
 from pymongo import MongoClient
+import pymongo
 from .user import User
 from werkzeug.security import generate_password_hash
+
+
 @app.route('/')
 def index():
     return send_file('templates/index.html')
@@ -14,51 +17,53 @@ def login():
 
     data = json.loads(request.data.decode())
 
-    username = data['username']
+    email = data['email']
     password = data['password']
 
-    user = app.config['USERS_COLLECTION'].find_one({"_id": username})
+    user = app.config['USERS_COLLECTION'].find_one({"_id": email})
     if user and User.validate_login(user['password'], password):
         user_obj = User(user['_id'])
         login_user(user_obj)
         print "logged in"
         ret = {
-            'message':"Logged in"
+            'result': True
         }
-        # flash("Logged in successfully", category='success')
-        # return redirect(request.args.get("next") or url_for("writePost"))
     else:
         print "failed logging in"
         ret = {
-            'message': "Failed logging in"
+            'result': False
         }
-        # flash("Wrong username or password", category='error')
-    # return render_template('login.html', title='login', form=form)
+
     return json.dumps(ret)
+
 
 @app.route('/register', methods=['POST'])
 def register():
+
     data = json.loads(request.data.decode())
     collection = MongoClient()['server-monitoring']['users']
-    username = data['username']
+    email = data['email']
     password = data['password']
 
     pass_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     # Insert the user in the DB
     try:
-        collection.insert({"_id": username, "password": pass_hash})
+        collection.insert({"_id": email, "password": pass_hash})
         print "User created."
         ret = {
-            'message':"User created"
+            'result': True
         }
-    except:
-        print "Something went horribly wrong, please try again"
+    except pymongo.errors.DuplicateKeyError, e:
+        print str(e)
         ret = {
-            'message':"Something went horribly wrong."
+            'result': False
         }
+    # except Exception, e:
+    #     print "str(e)";
 
     return json.dumps(ret)
+
 
 @app.route('/logout')
 def logout():
@@ -78,8 +83,8 @@ def logout():
 
 
 @lm.user_loader
-def load_user(username):
-    u = app.config['USERS_COLLECTION'].find_one({"_id": username})
+def load_user(email):
+    u = app.config['USERS_COLLECTION'].find_one({"_id": email})
     if not u:
         return None
     return User(u['_id'])
@@ -90,17 +95,17 @@ def ssh(request):
 
     data     = json.loads(request.data.decode())
     
-    username = data['user']
+    email = data['user']
     password = data['password']
     hostname = data['hostname']
     port     = data['port']
     nb_ip = 0
-    print username + "@" + hostname + ":" + str(port)
+    print email + "@" + hostname + ":" + str(port)
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-            ssh.connect(hostname, username=username, password=password, port=port)
+            ssh.connect(hostname, email=email, password=password, port=port)
     except paramiko.SSHException:
             print "Connection Failed"
             quit()
@@ -155,39 +160,29 @@ def connect():
 
     data     = json.loads(request.data.decode())
     
-    username = data['user']
+    email = data['user']
     password = data['password']
     hostname = data['hostname']
     port     = data['port']
 
-    print "[*] Connecting to : " +  username + "@" + hostname + ":" + str(port)
+    print "[*] Connecting to : " +  email + "@" + hostname + ":" + str(port)
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-            ssh.connect(hostname, username=username, password=password, port=port)
+            ssh.connect(hostname, email=email, password=password, port=port)
             res = {
-                message: "Connected to " + hostname + ":" + port + " as " + username
+                message: "Connected to " + hostname + ":" + port + " as " + email
             }
-            print "Connection successful to " + hostname + ":" + port + " as " + username
+            print "Connection successful to " + hostname + ":" + port + " as " + email
     except paramiko.SSHException:
             res = {
-                message: "Failed to connect to " + hostname + ":" + port + " as " + username
+                message: "Failed to connect to " + hostname + ":" + port + " as " + email
             }
             print "Connection Failed"
             quit()
 
     return json.dumps(res)
-
-
-# @app.route('logout')
-# def logout():
-#     # Log user out
-
-# @app.route('/register')
-# def register(request):
-#     # Register user
-#     data     = json.loads(request.data.decode())
 
 # @app.route("/exec", methods=['POST'])
 # def exec(request):

@@ -9,7 +9,9 @@ angular.module('myApp', [
     'datatables',
     'ui.router',
     'myApp.ProfilesService',
-    'myApp.Authentication'
+    'myApp.AuthenticationService',
+    'myApp.Authentication',
+    'myApp.UserProfil'
 ])
 
 .config(function(uiGmapGoogleMapApiProvider) {
@@ -20,17 +22,25 @@ angular.module('myApp', [
     });
 })
 
-.config(function($stateProvider, $urlRouterProvider){
+.run(function ($rootScope, $state, AuthService) {
+  $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+    if (toState.authenticate && !AuthService.isLoggedIn()){
+      // User isn’t authenticated
+      $state.transitionTo("login");
+      event.preventDefault(); 
+    }
+  });
+})
+
+.config(['$stateProvider', 
+        '$urlRouterProvider', 
+        '$locationProvider', 
+        function($stateProvider, $urlRouterProvider, $locationProvider){
     $stateProvider
         .state('home', {
             url:'/',
             templateUrl:'/static/partials/index.html',
             controller: 'HomeCtrl'
-        })
-        .state('map', {
-            url:'/map',
-            templateUrl:'/static/partials/map.html',
-            controller:'MapCtrl'
         })
         .state('login', {
             url:'/login',
@@ -42,8 +52,22 @@ angular.module('myApp', [
             templateUrl:'/static/partials/register.html',
             controller:'AuthCtrl'
         })
+        .state('profil', {
+            url:'/profil',
+            templateUrl: '/static/partials/profil.html',
+            controller:'ProfilCtrl',
+            // data : {requiresLogin : true }
+            authenticate: true
+        })
+        .state('map', {
+            url:'/map',
+            templateUrl:'/static/partials/map.html',
+            controller:'MapCtrl',
+            authenticate: true
+        })
 
     $urlRouterProvider.otherwise('/');
-})
+    // $locationProvider.html5Mode(true);
+}])
 
 

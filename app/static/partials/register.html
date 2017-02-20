@@ -1,22 +1,25 @@
-<div class="register">
+<div class="col-md-4"></div>
+<div class="col-md-4">
     <h2>Register</h2>
-    <form method="post" ng-submit="register()" class="well">
+    <div ng-show="error" class='alert alert-danger'>{{errorMessage}}</div>
+
+    <form method="post" ng-submit="register()" class="well form">
         
         <h4>Basic information</h4>
         <div class="well">
             <div class="form-group">
-                <label class="control-label">Username</label>
-                <input class="form-control" text" name="username" ng-model="username">    
+                <label class="control-label">email</label>
+                <input class="form-control" text" name="email" ng-model="registerForm.email">    
             </div>
             
             <div class="form-group">
                 <label class="control-label">Password</label>
-                <input class="form-control" type="password" name="password" ng-model="password">   
+                <input class="form-control" type="password" name="password" ng-model="registerForm.password">   
             </div>
             
             <div class="form-group">
                 <label class="control-label">Confirm password</label>
-                <input class="form-control" type="password" name="password">
+                <input class="form-control" type="password" name="password" ng-model="registerForm.confirmPassword">
 
             </div>    
         </div>
@@ -35,8 +38,8 @@
             </div>
             
             <div class="form-group">
-                <label class="control-label">Username</label>
-                <input class="form-control" text" name="username" ng-model="ssh_username">    
+                <label class="control-label">email</label>
+                <input class="form-control" text" name="email" ng-model="ssh_email">    
             </div>
             
             <div class="form-group">
@@ -45,6 +48,6 @@
             </div>    
         </div> -->
         
-        <button class="btn btn-primary pull-right">Register</button>
+        <button ng-disabled="disabled" class="btn btn-primary pull-right">Register</button>
     </form>
 </div>

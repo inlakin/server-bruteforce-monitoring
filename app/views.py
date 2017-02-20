@@ -1,6 +1,6 @@
 from app import app, lm
 from flask import send_file, request, redirect, render_template, url_for, flash, json
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from pymongo import MongoClient
 import pymongo
 from .user import User
@@ -12,7 +12,7 @@ def index():
     return send_file('templates/index.html')
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/auth/login', methods=['POST'])
 def login():  
 
     data = json.loads(request.data.decode())
@@ -37,7 +37,7 @@ def login():
     return json.dumps(ret)
 
 
-@app.route('/register', methods=['POST'])
+@app.route('/auth/register', methods=['POST'])
 def register():
 
     data = json.loads(request.data.decode())
@@ -65,7 +65,7 @@ def register():
     return json.dumps(ret)
 
 
-@app.route('/logout')
+@app.route('/auth/logout')
 def logout():
     try:
         logout_user()
@@ -82,6 +82,18 @@ def logout():
     return json.dumps(ret)
 
 
+@app.route('/auth/status', methods=['GET'])
+def status():
+    response = {'status':''}
+
+    if current_user.is_authenticated:
+        response['status'] = True
+    else:
+        response['status'] = False
+
+    return json.dumps(response)
+
+
 @lm.user_loader
 def load_user(email):
     u = app.config['USERS_COLLECTION'].find_one({"_id": email})
@@ -91,6 +103,7 @@ def load_user(email):
 
 
 @app.route('/ssh', methods=['POST'])
+@login_required
 def ssh(request):
 
     data     = json.loads(request.data.decode())
@@ -155,34 +168,39 @@ def ssh(request):
     return json.dumps(profiles)
 
 
+
 @app.route('/connect', methods=['POST'])
+@login_required
 def connect():
 
-    data     = json.loads(request.data.decode())
+    # data     = json.loads(request.data.decode())
     
-    email = data['user']
-    password = data['password']
-    hostname = data['hostname']
-    port     = data['port']
+    # email = data['user']
+    # password = data['password']
+    # hostname = data['hostname']
+    # port     = data['port']
 
-    print "[*] Connecting to : " +  email + "@" + hostname + ":" + str(port)
+    # print "[*] Connecting to : " +  email + "@" + hostname + ":" + str(port)
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    try:
-            ssh.connect(hostname, email=email, password=password, port=port)
-            res = {
-                message: "Connected to " + hostname + ":" + port + " as " + email
-            }
-            print "Connection successful to " + hostname + ":" + port + " as " + email
-    except paramiko.SSHException:
-            res = {
-                message: "Failed to connect to " + hostname + ":" + port + " as " + email
-            }
-            print "Connection Failed"
-            quit()
+    # ssh = paramiko.SSHClient()
+    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    # try:
+    #         ssh.connect(hostname, email=email, password=password, port=port)
+    #         res = {
+    #             message: "Connected to " + hostname + ":" + port + " as " + email
+    #         }
+    #         print "Connection successful to " + hostname + ":" + port + " as " + email
+    # except paramiko.SSHException:
+    #         res = {
+    #             message: "Failed to connect to " + hostname + ":" + port + " as " + email
+    #         }
+    #         print "Connection Failed"
+    #         quit()
 
-    return json.dumps(res)
+    # return json.dumps(res)
+    ret = {}
+    ret = {'ret':'fail'}
+    return json.dumps(ret);
 
 # @app.route("/exec", methods=['POST'])
 # def exec(request):

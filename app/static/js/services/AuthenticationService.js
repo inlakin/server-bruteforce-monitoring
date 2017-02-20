@@ -12,7 +12,8 @@ angular.module('myApp.AuthenticationService', [])
         isLoggedIn: isLoggedIn,
         login: login,
         logout: logout,
-        register: register
+        register: register,
+        getUserStatus: getUserStatus
     });
 
     function isLoggedIn(){
@@ -22,11 +23,11 @@ angular.module('myApp.AuthenticationService', [])
             return false;
         }
     }
-    
+
     function login(email, password){
         var deferred = $q.defer();
 
-        $http.post('/login', {email:email, password:password})
+        $http.post('/auth/login', {email:email, password:password})
         .success(function(data, status) {
             if (status === 200 && data.result){
                 user = true;
@@ -47,7 +48,7 @@ angular.module('myApp.AuthenticationService', [])
     function logout(){
         var deferred = $q.defer();
 
-        $http.get('/logout')
+        $http.get('/auth/logout')
         .success(function(data){
             user = false;
             deferred.resolve()
@@ -63,7 +64,7 @@ angular.module('myApp.AuthenticationService', [])
     function register(email, password){
         var deferred = $q.defer();
 
-        $http.post('/register', {email:email, password:password})
+        $http.post('/auth/register', {email:email, password:password})
         .success(function(data, status){
             if (status === 200 && data.result){
                 deferred.resolve();
@@ -76,5 +77,20 @@ angular.module('myApp.AuthenticationService', [])
         });
 
         return deferred.promise;
+    }
+
+    function getUserStatus(){
+
+        return $http.get('/auth/status')
+            .success(function(data){
+                if (data.status) {
+                    user = true;
+                } else {
+                    user = false;
+                }
+            })
+            .error(function(data){
+                user = false;
+            })
     }
 }]);

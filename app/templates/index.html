@@ -33,7 +33,6 @@
     <script src="static/js/app.js"></script>
     <script src="static/js/controllers/AuthController.js"></script>
     <script src="static/js/controllers/HomeController.js"></script>
-    <script src="static/js/controllers/LogoutController.js"></script>
     <script src="static/js/controllers/MapController.js"></script>
     <script src="static/js/controllers/ProfilController.js"></script>
    
@@ -62,7 +61,7 @@
             <li><a ui-sref="login">Login</a></li>
             <li role="separator" class="divider"></li>
             <li><a ui-sref="register">Register</a></li>
-            <li><div ng-controller="AuthCtrl"><a ng-click="logout()">Logout</a></div></li>
+            <li><a ng-click="logout()" ng-controller="AuthCtrl">Logout</a></div></li>
         </ul>
       </div>
     </div>

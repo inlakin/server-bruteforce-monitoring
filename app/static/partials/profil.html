@@ -67,9 +67,9 @@
                 <tr>
                     <th>#</th>
                     <th>Server name</th>
-                    <th>Server adress</th>
+                    <th>Hostname</th>
                     <th>Username</th>
-                    <th>Password</th>
+                    <th>Port</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -80,9 +80,9 @@
                 <tr ng-repeat="s in servers track by $index">
                     <th scope="row">{{$index+1}}</th>
                     <td> {{s.name}} </td>
-                    <td> {{s.ip}} </td>
+                    <td> {{s.hostname}} </td>
                     <td> {{s.username}} </td>
-                    <td> {{s.password}} </td>
+                    <td> {{s.port}} </td>
                     <td> Connect</td>
                     <td> Edit</td>
                     <td> Delete</td>

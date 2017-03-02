@@ -113,17 +113,15 @@ def add_server():
     data       = json.loads(request.data.decode())
     collection = MongoClient()['server-monitoring']['clients']
     
+    name     = data['name']
     username = data['username']
-    password = data['password']
     hostname = data['hostname']
     port     = data['port']
     
-    pass_hash = generate_password_hash(password, method='pbkdf2:sha256')
-
     try:
         collection.insert({
             "_id": hostname,
-            "password" : pass_hash,
+            "name": name,
             "username" : username,
             "port" : port
             })   
@@ -144,22 +142,13 @@ def getservers():
 
     clients = app.config['CLIENTS_COLLECTION'].find()
 
-    for c in clients:
-        clients_list.append(c)
-        for cli in clients_list:
-            print cli["_id"]
-
     if clients is not None:
-        print "COCUOUC"
-        ret = {'result': True}
+        print "So far so good"
+        ret = [{'result': True}]
         for c in clients:
-            client = c 
-            print "Added " + client["_id"]
-            ret.append(clients_list)  
-
+            ret.append(c)
     else:
-        print "NOOOOPE"
-        ret = {'result': False}
+        ret = [{'result': False}]
 
     return json.dumps(ret)
 

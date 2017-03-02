@@ -11,13 +11,13 @@ angular.module('myApp.SSHClientService', [])
         getServers: getServers
     };
 
-    function addServer(hostname, password, username, port){
+    function addServer(name, hostname, username, port){
         var deferred = $q.defer();
 
         $http.post('/addserver', {
-            hostname:hostname,
+            name: name, 
+            hostname: hostname,
             username: username,
-            password:password,
             port: port
         })
         .success(function(data, status){
@@ -65,13 +65,17 @@ angular.module('myApp.SSHClientService', [])
 
         $http.get('/getservers')
         .success(function(data, status){
-            if(status == 200 && data.result){
-                console.log(JSON.stringify(data.client))
+            console.log(data[0])
+            console.log(data[2])
+
+            console.log()
+            if(status == 200 && data[0].result){
+                // console.log(JSON.stringify(data.clients))
                 console.log("So far so good")
-                deferred.resolve(data.client)
+                deferred.resolve(data)
             } else {
                 deferred.reject()
-                console.log("Not so good " + data.result )
+                console.log("Not so good " + data['result'] )
                 console.log(JSON.stringify(data, null, 2))
             }
         })

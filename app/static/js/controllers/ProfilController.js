@@ -42,31 +42,23 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     errorMessage   = ""
     successMessage = ""
 
-    $scope.servers = [
-        {
-            "name": "Server perso",
-            "ip": "vps214516.ovh.net",
-            "username": "goa",
-            "password": "****"
-        },
-        {
-            "name": "Server pro 1",
-            "ip": "frei.berlin.net",
-            "username": "edgar",
-            "password": "*******"
-        },
-        {
-            "name": "Server pro 2",
-            "ip": "achtung.gandhi.fr",
-            "username": "sweet",
-            "password": "*******"
-        }
-    ]
+    $scope.servers = []
+
     $scope.getServer = function(){
         SSH.getServers()
         .then(function(data){
-            console.log(JSON.stringify(data, null, 2))
-            console.log("[*] Good job")
+
+            for (var i=1; i < data.length;i++){
+                s = []
+
+                s['name']     = data[i]['name'];
+                s['hostname'] = data[i]['_id'];
+                s['username'] = data[i]['username'];
+                s['port']     = data[i]['port'];
+
+                $scope.servers.push(s)
+            }
+
         })
         .catch(function(){
             console.log("[-] Failed to fetch servers")
@@ -74,13 +66,15 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     }
     $scope.addServer = function(){
 
-       SSH.addServer($scope.serverForm.hostname, $scope.serverForm.password, $scope.serverForm.username, $scope.serverForm.port)
+       SSH.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port)
         .then(function(){
             $scope.success        = true;
             $scope.successMessage = "Server added"
             $scope.serverForm     = {}
             $scope.disabled       = false
             console.log("[*] Server added");
+            // Need to dismiss the modal
+            //  $state.reload()
         })
         .catch(function(){
             $scope.error        = true;
@@ -90,13 +84,8 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             console.log("[*] Failed to add server")
         })
 
-        // console.log(JSON.stringify(server, null, 2))
     }
 
     $scope.getServer();
-
-    // $scope.getUser = function(){
-    //     $http.get('/user/')
-    // }
     
 }])

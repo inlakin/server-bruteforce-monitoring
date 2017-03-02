@@ -1,3 +1,7 @@
+#! /usr/bin/env python
+#
+# -*- coding:utf-8 -*-
+
 from app import app, lm
 from flask import send_file, request, redirect, render_template, url_for, flash, json
 from flask_login import login_user, logout_user, login_required, current_user
@@ -6,6 +10,7 @@ import pymongo
 from .user import User
 from werkzeug.security import generate_password_hash
 
+ssh = []
 
 @app.route('/')
 def index():
@@ -101,106 +106,105 @@ def load_user(email):
         return None
     return User(u['_id'])
 
-
-@app.route('/ssh', methods=['POST'])
+@app.route('/addserver', methods=['POST'])
 @login_required
-def ssh(request):
-
-    data     = json.loads(request.data.decode())
+def add_server():
     
-    email = data['user']
+    data       = json.loads(request.data.decode())
+    collection = MongoClient()['server-monitoring']['clients']
+    
+    username = data['username']
     password = data['password']
     hostname = data['hostname']
     port     = data['port']
-    nb_ip = 0
-    print email + "@" + hostname + ":" + str(port)
+    
+    pass_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-            ssh.connect(hostname, email=email, password=password, port=port)
-    except paramiko.SSHException:
-            print "Connection Failed"
-            quit()
-     
-    stdin,stdout,stderr = ssh.exec_command("zgrep 'Failed password for' /var/log/auth.log* | grep -Po '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | sort | uniq")
-     
-    for ip in stdout.readlines():
-            # print line.strip()
-            r     = {}
-            nb_ip += 1
+        collection.insert({
+            "_id": hostname,
+            "password" : pass_hash,
+            "username" : username,
+            "port" : port
+            })   
+        print "[*] Client added : ", hostname
+        ret = {'result': True}
+    except pymongo.errors.DuplicateKeyError, e:
+        print str(e)
+        ret = {'result': False}
 
-            if ip[0] == "0":
-                print "Debut d'ip"
-                print ip
-                print ip[1:]
-                try:
-                    response         = reader.city(ip[1:].strip('\n'))
+    return json.dumps(ret)
 
-                    r['ip']          = ip[1:].strip('\n')
-                    r['country']     = response.country.name
-                    r['city']        = response.city.name
-                    r['postal_code'] = response.postal.code
-                    r['latitude']    = response.location.latitude
-                    r['longitude']   = response.location.longitude
 
-                    profiles.append(r) 
+@app.route('/getservers', methods=['GET'])
+@login_required
+def getservers():
 
-                except Exception, e:
-                    print str(e)
-            else:
-                try:
-                    response         = reader.city(ip.strip('\n'))
+    clients_list = []
 
-                    r['ip']          = ip.strip('\n')
-                    r['country']     = response.country.name
-                    r['city']        = response.city.name
-                    r['postal_code'] = response.postal.code
-                    r['latitude']    = response.location.latitude
-                    r['longitude']   = response.location.longitude
+    clients = app.config['CLIENTS_COLLECTION'].find()
 
-                    profiles.append(r)
+    for c in clients:
+        clients_list.append(c)
+        for cli in clients_list:
+            print cli["_id"]
 
-                except Exception, e:
-                    print str(e)
-    ssh.close()
+    if clients is not None:
+        print "COCUOUC"
+        ret = {'result': True}
+        for c in clients:
+            client = c 
+            print "Added " + client["_id"]
+            ret.append(clients_list)  
 
-    return json.dumps(profiles)
+    else:
+        print "NOOOOPE"
+        ret = {'result': False}
 
+    return json.dumps(ret)
 
 
 @app.route('/connect', methods=['POST'])
 @login_required
 def connect():
+    data = json.loads(request.data.decode())
 
-    # data     = json.loads(request.data.decode())
+    hostname = data['hostname']
+    password = data['password']
     
-    # email = data['user']
-    # password = data['password']
-    # hostname = data['hostname']
-    # port     = data['port']
+    client = app.config['CLIENTS_COLLECTION'].find_one({"_id": id})
+    
+    if client and Client.validate_login(client['password'], password):
+        client_obj = Client(client['_id'])
+        print client_obj
 
-    # print "[*] Connecting to : " +  email + "@" + hostname + ":" + str(port)
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            ssh.connect(hostname, email=user, password=password, port=port)
+    
+            print "[*] Connected to ", client_obj['_id']
+            ret = {
+                'result': True,
+                'id': client_obj['_id']
+            }
 
-    # ssh = paramiko.SSHClient()
-    # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    # try:
-    #         ssh.connect(hostname, email=email, password=password, port=port)
-    #         res = {
-    #             message: "Connected to " + hostname + ":" + port + " as " + email
-    #         }
-    #         print "Connection successful to " + hostname + ":" + port + " as " + email
-    # except paramiko.SSHException:
-    #         res = {
-    #             message: "Failed to connect to " + hostname + ":" + port + " as " + email
-    #         }
-    #         print "Connection Failed"
-    #         quit()
+        except paramiko.SSHException:
+            print "[-] Connection failed"
+            quit()
+            ret = {'result': False}
+    
+    else:
+        print "Failed"
+        ret = {'result': False}
 
-    # return json.dumps(res)
-    ret = {}
-    ret = {'ret':'fail'}
-    return json.dumps(ret);
+    return json.dumps(ret)
+
+
+# @app.route('/disconnect/:id', methods=['POST'])
+# @login_required
+# def disconnect()
+
 
 # @app.route("/exec", methods=['POST'])
 # def exec(request):

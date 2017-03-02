@@ -10,8 +10,10 @@ angular.module('myApp', [
     'ui.router',
     'myApp.ProfilesService',
     'myApp.AuthenticationService',
+    'myApp.SSHClientService',
     'myApp.Authentication',
-    'myApp.UserProfil'
+    'myApp.UserProfil',
+    'angular-terminal'
 ])
 
 .config(function(uiGmapGoogleMapApiProvider) {

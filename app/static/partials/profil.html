@@ -1,1 +1,134 @@
-<h3>{{ username }}'s profile</h3>
+<style type="text/css">
+    .terminal-container{
+        height: 200px;
+        box-shadow: 0.5em 0.5em 0.5em 0 gray;
+    }
+</style>
+
+<div class="col-md-4"></div>
+<div class="col-md-4">
+    <button data-toggle="modal" href="#addServer" class="btn btn-primary">Add server</button>
+
+    <div class="modal" id="addServer">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <h4 class="modal-title">Add a new server</h4>
+                </div>
+                <div class="modal-body">
+                    
+                    <div ng-show="error" class="alert alert-danger"> {{errorMessage}} </div>
+                    <div ng-show="success" class="success"> {{successMessage}} </div>
+                    <form ng-submit="addServer()" method="POST" class="form">
+                        <div class="well">
+                            <div class="form-group">
+                                <label class="control-label">Server name</label>
+                                <input type="text" name="server-name" class="form-control" ng-model="serverForm.name">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Server adress or IP</label>
+                                <input type="text" name="server-hostname" class="form-control" ng-model="serverForm.hostname">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Username</label>
+                                <input type="text" name="server-username" class="form-control" ng-model="serverForm.username">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Password</label>
+                                <input type="password" name="server-password" class="form-control" ng-model="serverForm.password">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Port</label>
+                                <input type="text" name="server-port" class="form-control" ng-model="serverForm.port">
+                            </div>
+
+                            <button class="btn btn-success" ng-disabled="disabled">Add Server</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-4"></div>
+
+
+
+
+<hr>
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Server name</th>
+                    <th>Server adress</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="s in servers track by $index">
+                    <th scope="row">{{$index+1}}</th>
+                    <td> {{s.name}} </td>
+                    <td> {{s.ip}} </td>
+                    <td> {{s.username}} </td>
+                    <td> {{s.password}} </td>
+                    <td> Connect</td>
+                    <td> Edit</td>
+                    <td> Delete</td>
+                    <td> View map</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+<!-- 
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-5">
+        <div class="terminal-container" angular-terminal="main"></div>
+    </div>
+
+    <div class="col-md-1"></div>
+    <div class="col-md-4">
+        <h3>Mettre à jour mes informations</h3>
+        <div class="">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th>Username</th>
+                        <th>{{username}}</th>
+                    </tr>              
+                    <tr>
+                        <th>Email</th>
+                        <th>{{email}}</th>
+                    </tr>             
+                    <tr>
+                        <th>New password</th>
+                        <th><input type="password" name="new_pass"></th>
+                    </tr>             
+                    <tr>
+                        <th>Confirm new password</th>
+                        <th><input type="password" name="confirm_new_pass"></th>
+                    </tr>             
+                </tbody>
+            </table>
+            <button class="btn btn-primary">Update</button>
+        </div>
+    <div class="col-md-1"></div>
+
+    </div>
+</div> -->
+
+

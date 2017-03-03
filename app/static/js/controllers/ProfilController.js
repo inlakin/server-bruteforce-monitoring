@@ -40,11 +40,11 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     'AuthService',
     function($scope, $state, $http, SSH, AuthService){
     
-    errorMessage   = ""
-    successMessage = ""
+    errorMessage   = "";
+    successMessage = "";
 
-    $scope.servers = []
-    $scope.user = ""
+    $scope.servers = [];
+    $scope.user = "";
 
     $scope.getServer = function(){
         SSH.getServers($scope.user)
@@ -60,7 +60,6 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
                 $scope.servers.push(s)
             }
-
         })
         .catch(function(){
             console.log("[-] Failed to fetch servers")
@@ -87,6 +86,9 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
         })
     }
 
+    $scope.connect = function(username, hostname, port){
+        console.log("[*] Connecting to " + username + "@" + hostname + ":" + port)
+    }
 
     if (AuthService.getUser() == "") {
         console.log("[*] getUser() : "+AuthService.getUser());

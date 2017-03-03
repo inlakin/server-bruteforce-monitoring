@@ -110,7 +110,6 @@ angular.module('myApp.AuthenticationService', [])
         
         user_email = localStorage.getItem('email');
         if (user_email != ""){
-            console.log(user_email)
             return user_email
         } else {
             return ""

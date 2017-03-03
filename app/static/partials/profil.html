@@ -12,59 +12,6 @@
     </div>
     <div class="col-md-4"></div>
 </div>
-<div class="col-md-4"></div>
-<div class="col-md-4">
-    <button data-toggle="modal" href="#addServer" class="btn btn-primary">Add server</button>
-
-    <div class="modal" id="addServer">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">x</button>
-                    <h4 class="modal-title">Add a new server</h4>
-                </div>
-                <div class="modal-body">
-                    
-                    <div ng-show="error" class="alert alert-danger"> {{errorMessage}} </div>
-                    <div ng-show="success" class="success"> {{successMessage}} </div>
-                    <form ng-submit="addServer()" method="POST" class="form">
-                        <div class="well">
-                            <div class="form-group">
-                                <label class="control-label">Server name</label>
-                                <input type="text" name="server-name" class="form-control" ng-model="serverForm.name">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Server adress or IP</label>
-                                <input type="text" name="server-hostname" class="form-control" ng-model="serverForm.hostname">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Username</label>
-                                <input type="text" name="server-username" class="form-control" ng-model="serverForm.username">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Password</label>
-                                <input type="password" name="server-password" class="form-control" ng-model="serverForm.password">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label">Port</label>
-                                <input type="text" name="server-port" class="form-control" ng-model="serverForm.port">
-                            </div>
-
-                            <button class="btn btn-success" ng-disabled="disabled">Add Server</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="col-md-4"></div>
-
-
-
-
-<hr>
 
 <div class="row">
     <div class="col-md-2"></div>
@@ -80,7 +27,9 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    <th></th>
+                    <th>
+                        <button data-toggle="modal" href="#addServer" class="btn btn-primary">Add server</button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -90,13 +39,65 @@
                     <td> {{s.hostname}} </td>
                     <td> {{s.username}} </td>
                     <td> {{s.port}} </td>
-                    <td> Connect</td>
-                    <td> Edit</td>
-                    <td> Delete</td>
-                    <td> View map</td>
+                    <td "> 
+                        <span ng-click="connect(s.username, s.hostname, s.port)" class="glyphicon glyphicon-play icon icon-connect"> Connect</span>
+                    </td>
+                    <td> 
+                        <span ng-click="edit()" class="glyphicon glyphicon-edit icon icon-edit"> Edit</span>
+                    </td>
+                    <td>
+                        <span ng-click="trash()" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
+                     </td>
+                    <td>
+                        <span ng-click="viewmap()" class="glyphicon glyphicon-globe icon icon-globe"> View map</span> 
+                     </td>
                 </tr>
             </tbody>
         </table>
+
+        <div class="modal" id="addServer">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">x</button>
+                        <h4 class="modal-title">Add a new server</h4>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <div ng-show="error" class="alert alert-danger"> {{errorMessage}} </div>
+                        <div ng-show="success" class="success"> {{successMessage}} </div>
+                        <form ng-submit="addServer()" method="POST" class="form">
+                            <div class="well">
+                                <div class="form-group">
+                                    <label class="control-label">Server name</label>
+                                    <input type="text" name="server-name" class="form-control" ng-model="serverForm.name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Server adress or IP</label>
+                                    <input type="text" name="server-hostname" class="form-control" ng-model="serverForm.hostname">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Username</label>
+                                    <input type="text" name="server-username" class="form-control" ng-model="serverForm.username">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Password</label>
+                                    <input type="password" name="server-password" class="form-control" ng-model="serverForm.password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Port</label>
+                                    <input type="text" name="server-port" class="form-control" ng-model="serverForm.port">
+                                </div>
+
+                                <button class="btn btn-success" ng-disabled="disabled">Add Server</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <div class="col-md-2"></div>
 </div>

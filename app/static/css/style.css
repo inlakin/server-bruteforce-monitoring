@@ -8,3 +8,26 @@ body{
     width: 30%;
     margin:auto;
 }
+
+.icon{
+    cursor: pointer;
+}
+
+.clickable{
+    cursor: pointer;
+}
+.icon-connect{
+    color:green;
+}
+
+.icon-edit{
+    color: gray;
+}
+
+.icon-trash{
+    color: red;
+}
+
+.icon-globe{
+    color: ;
+}

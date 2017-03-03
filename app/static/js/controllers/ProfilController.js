@@ -37,22 +37,24 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     '$state',
     '$http',
     'SSH',
-    function($scope, $state, $http, SSH){
+    'AuthService',
+    function($scope, $state, $http, SSH, AuthService){
     
     errorMessage   = ""
     successMessage = ""
 
     $scope.servers = []
+    $scope.user = ""
 
     $scope.getServer = function(){
-        SSH.getServers()
+        SSH.getServers($scope.user)
         .then(function(data){
 
             for (var i=1; i < data.length;i++){
                 s = []
 
                 s['name']     = data[i]['name'];
-                s['hostname'] = data[i]['_id'];
+                s['hostname'] = data[i]['hostname'];
                 s['username'] = data[i]['username'];
                 s['port']     = data[i]['port'];
 
@@ -66,7 +68,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     }
     $scope.addServer = function(){
 
-       SSH.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port)
+       SSH.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user)
         .then(function(){
             $scope.success        = true;
             $scope.successMessage = "Server added"
@@ -83,9 +85,15 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             $scope.disabled     = false;
             console.log("[*] Failed to add server")
         })
-
     }
 
-    $scope.getServer();
+
+    if (AuthService.getUser() == "") {
+        console.log("[*] getUser() : "+AuthService.getUser());
+    } else {
+        $scope.user = AuthService.getUser();
+        console.log("[*] getUser() " + $scope.user);
+        $scope.getServer($scope.user);
+    }
     
 }])

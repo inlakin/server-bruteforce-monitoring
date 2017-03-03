@@ -9,6 +9,14 @@ from pymongo import MongoClient
 import pymongo
 from .user import User
 from werkzeug.security import generate_password_hash
+from bson import ObjectId
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+
+        return json.JSONEncoder.default(self, o)
 
 ssh = []
 
@@ -29,9 +37,11 @@ def login():
     if user and User.validate_login(user['password'], password):
         user_obj = User(user['_id'])
         login_user(user_obj)
-        print "logged in"
+        # print JSONEncoder().encode(user_obj)
+        print "logged in for ", user['_id']
         ret = {
-            'result': True
+            'result': True,
+            'email': user['_id']
         }
     else:
         print "failed logging in"
@@ -117,13 +127,16 @@ def add_server():
     username = data['username']
     hostname = data['hostname']
     port     = data['port']
+    email    = data['email']
     
+    print "[*] Adding new server for ", email
     try:
         collection.insert({
-            "_id": hostname,
+            "hostname": hostname,
             "name": name,
             "username" : username,
-            "port" : port
+            "port" : port,
+            "email": email
             })   
         print "[*] Client added : ", hostname
         ret = {'result': True}
@@ -134,23 +147,27 @@ def add_server():
     return json.dumps(ret)
 
 
-@app.route('/getservers', methods=['GET'])
+@app.route('/getservers', methods=['POST'])
 @login_required
 def getservers():
 
+    data = json.loads(request.data.decode())
+
+    email = data['email']
+
+    print "[*] Fetching servers for ", email
     clients_list = []
 
-    clients = app.config['CLIENTS_COLLECTION'].find()
+    clients = app.config['CLIENTS_COLLECTION'].find({'email': email})
 
     if clients is not None:
-        print "So far so good"
         ret = [{'result': True}]
         for c in clients:
             ret.append(c)
     else:
         ret = [{'result': False}]
 
-    return json.dumps(ret)
+    return JSONEncoder().encode(ret)
 
 
 @app.route('/connect', methods=['POST'])

@@ -11,14 +11,15 @@ angular.module('myApp.SSHClientService', [])
         getServers: getServers
     };
 
-    function addServer(name, hostname, username, port){
+    function addServer(name, hostname, username, port, email){
         var deferred = $q.defer();
 
         $http.post('/addserver', {
             name: name, 
             hostname: hostname,
             username: username,
-            port: port
+            port: port,
+            email: email
         })
         .success(function(data, status){
             if (status == 200 && data.result){
@@ -32,6 +33,26 @@ angular.module('myApp.SSHClientService', [])
         });
 
         return deferred.promise;
+    }
+
+    function getServers(email){
+        var deferred = $q.defer();
+
+        $http.post('/getservers', {email:email})
+        .success(function(data, status){
+            if(status == 200 && data[0].result){
+                deferred.resolve(data)
+            } else {
+                deferred.reject()
+                console.log(JSON.stringify(data, null, 2))
+            }
+        })
+        .error(function(data){
+            deferred.reject()
+        })
+
+        return deferred.promise;
+
     }
 
     function connect(hostname, username, password, port){
@@ -59,33 +80,7 @@ angular.module('myApp.SSHClientService', [])
 
         return deferred.promise;
     }
-
-    function getServers(){
-        var deferred = $q.defer();
-
-        $http.get('/getservers')
-        .success(function(data, status){
-            console.log(data[0])
-            console.log(data[2])
-
-            console.log()
-            if(status == 200 && data[0].result){
-                // console.log(JSON.stringify(data.clients))
-                console.log("So far so good")
-                deferred.resolve(data)
-            } else {
-                deferred.reject()
-                console.log("Not so good " + data['result'] )
-                console.log(JSON.stringify(data, null, 2))
-            }
-        })
-        .error(function(data){
-            deferred.reject()
-        })
-
-        return deferred.promise;
-
-    }
+    
     function disconnect(hostname){
         var deffered = $q.defer();
 

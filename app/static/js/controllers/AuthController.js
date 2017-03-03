@@ -13,11 +13,10 @@ angular.module('myApp.Authentication', [])
         $scope.error    = false
 
         AuthService.login($scope.loginForm.email, $scope.loginForm.password)
-        .then(function(){
+        .then(function(data){
             $state.go('profil');
             $scope.disabled  = false;
             $scope.loginForm = {}
-            console.log('Logged in ')
         })
 
         .catch(function(){

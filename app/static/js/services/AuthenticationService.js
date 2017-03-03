@@ -5,15 +5,23 @@
 */
 angular.module('myApp.AuthenticationService', [])
 
-.factory('AuthService', ['$q', '$timeout', '$http', function($q, $timeout, $http){
+.factory('AuthService', [
+    '$q',
+    '$timeout', 
+    '$http', 
+    function($q, $timeout, $http){
+
+
     var user = null;
+    var user_email = "";
 
     return ({
         isLoggedIn: isLoggedIn,
         login: login,
         logout: logout,
         register: register,
-        getUserStatus: getUserStatus
+        getUserStatus: getUserStatus,
+        getUser: getUser
     });
 
     function isLoggedIn(){
@@ -31,13 +39,17 @@ angular.module('myApp.AuthenticationService', [])
         .success(function(data, status) {
             if (status === 200 && data.result){
                 user = true;
+                localStorage.setItem('email', data.email)
                 deferred.resolve();
             } else {
+                console.log('[-] Failed to log in')
                 user = false;
+                localStorage.setItem('email', "")
                 deferred.reject();
             }
         })
         .error(function(data){
+            console.log('[-] Error on login')
             user = false;
             deferred.reject()
         });
@@ -93,4 +105,33 @@ angular.module('myApp.AuthenticationService', [])
                 user = false;
             })
     }
+
+    function getUser(){
+        
+        user_email = localStorage.getItem('email');
+        if (user_email != ""){
+            console.log(user_email)
+            return user_email
+        } else {
+            return ""
+        }
+    }
+
+    //     var deferred = $q.defer()
+
+    //     $http.get('/getuser')
+    //     .success(function(data, status){
+    //         if (status == 200 && data.result){
+    //             deferred.resolve(data.user_id)
+    //             console.log('[*] User fetched ' + data.user_id)
+    //         } else {
+    //             deferred.reject()
+    //             console.log('[*] Failed to fetch user id')
+    //         }
+    //     })
+    //     .error(function(data){
+    //         deferred.reject()
+    //         console.log('[*] Oups something went wrong while fetching user')            
+    //     })
+    // }
 }]);

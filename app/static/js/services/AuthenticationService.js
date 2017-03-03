@@ -63,10 +63,12 @@ angular.module('myApp.AuthenticationService', [])
         $http.get('/auth/logout')
         .success(function(data){
             user = false;
+            localStorage.setItem('email', "")
             deferred.resolve()
         })
         .error(function(data){
             user = false;
+            localStorage.setItem('email', "")
             deferred.reject()
         });
 

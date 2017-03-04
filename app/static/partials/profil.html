@@ -7,8 +7,8 @@
 
 <div class="row">
     <div class="col-md-4"></div>
-    <div class="col-md-4">
-        <h3>Welcome back {{ user }}</h3>
+    <div class="col-md-4 alert alert-info" style="text-align: center;">
+        <h4>Welcome back</h4>
     </div>
     <div class="col-md-4"></div>
 </div>
@@ -28,6 +28,7 @@
                     <th></th>
                     <th></th>
                     <th>
+                        <button class="btn btn-success" ng-click="refreshServer()"><span class="glyphicon glyphicon-refresh"></span></button>
                         <button data-toggle="modal" href="#addServer" class="btn btn-primary">Add server</button>
                     </th>
                 </tr>
@@ -46,7 +47,7 @@
                         <span ng-click="edit()" class="glyphicon glyphicon-edit icon icon-edit"> Edit</span>
                     </td>
                     <td>
-                        <span ng-click="trash()" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
+                        <span ng-click="deleteServer(s.username, s.hostname, s.port)" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
                      </td>
                     <td>
                         <span ng-click="viewmap()" class="glyphicon glyphicon-globe icon icon-globe"> View map</span> 
@@ -65,7 +66,7 @@
                     <div class="modal-body">
                         
                         <div ng-show="error" class="alert alert-danger"> {{errorMessage}} </div>
-                        <div ng-show="success" class="success"> {{successMessage}} </div>
+                        <div ng-show="success" class="alert alert-success"> {{successMessage}} </div>
                         <form ng-submit="addServer()" method="POST" class="form">
                             <div class="well">
                                 <div class="form-group">

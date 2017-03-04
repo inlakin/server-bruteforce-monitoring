@@ -70,8 +70,17 @@
                 <li ng-hide="loggedIn"><a ui-sref="login">Login</a></li>
                 <li role="separator" class="divider"></li>
                 <li ng-hide="loggedIn"><a ui-sref="register">Register</a></li>
-                <!-- <li ng-show="loggedIn">{{'{user_email}'}}</li> -->
-                <li ng-show="loggedIn"><a ng-click="logout()">Logout</a></div></li>
+                <li class="dropdown" ng-show="loggedIn">
+                    <a href="" data-toggle="dropdown" class="dropdown-toggle">
+                        {{userEmail}} 
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a ui-sref="profil">Profil</a></li>
+                        <li><a ng-click="logout()">Logout</a></li>
+                    </ul>
+                </li>
+                
             </ul>
           </div>
         </div>

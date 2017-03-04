@@ -14,7 +14,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
         '\tssh\t\tssh command\n' +
         '\tpwd\t\tprint this page\n';
     
-    console.log(terminal_help)
+    // console.log(terminal_help)
 
     $rootScope.$on('terminal.main', function (e, input, terminal) {
         // $rootScope.$emit('terminal.main.echo', 'input received: ' + input)
@@ -65,6 +65,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             console.log("[-] Failed to fetch servers")
         })
     }
+    
     $scope.addServer = function(){
 
        SSH.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user)
@@ -88,6 +89,15 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
     $scope.connect = function(username, hostname, port){
         console.log("[*] Connecting to " + username + "@" + hostname + ":" + port)
+    }
+
+    $scope.deleteServer = function(username, hostname, port){
+        console.log("[*] Deleting " + username + "@" + hostname + ":" + port)
+    }
+
+    $scope.refreshServer = function(){
+        $scope.servers = [];
+        $scope.getServer($scope.user);
     }
 
     if (AuthService.getUser() == "") {

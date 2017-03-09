@@ -100,7 +100,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
         if ($scope.serversUp.length == 0){
 
-            SSH.betaConnect(hostname, username, port, email)
+            SSH.connect(hostname, username, port, email)
             .then(function(){
                 console.log("[DEBUG] Connected")
                 $scope.serversUp.push({'hostname':hostname});

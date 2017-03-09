@@ -10,6 +10,8 @@ import pymongo
 from .user import User
 from werkzeug.security import generate_password_hash
 from bson import ObjectId
+import paramiko
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -169,47 +171,9 @@ def getservers():
 
     return JSONEncoder().encode(ret)
 
-
 @app.route('/connect', methods=['POST'])
 @login_required
 def connect():
-    data = json.loads(request.data.decode())
-
-    hostname = data['hostname']
-    password = data['password']
-    
-    client = app.config['CLIENTS_COLLECTION'].find_one({"_id": id})
-    
-    if client and Client.validate_login(client['password'], password):
-        client_obj = Client(client['_id'])
-        print client_obj
-
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        try:
-            ssh.connect(hostname, email=user, password=password, port=port)
-    
-            print "[*] Connected to ", client_obj['_id']
-            ret = {
-                'result': True,
-                'id': client_obj['_id']
-            }
-
-        except paramiko.SSHException:
-            print "[-] Connection failed"
-            quit()
-            ret = {'result': False}
-    
-    else:
-        print "Failed"
-        ret = {'result': False}
-
-    return json.dumps(ret)
-
-
-@app.route('/betaconnect', methods=['POST'])
-@login_required
-def betaconnect():
 
     data = json.loads(request.data.decode())
 
@@ -220,11 +184,22 @@ def betaconnect():
         ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
         if ssh_client is not None:
             
-            # ATTEMPT CONNECTION HERE
-
             db_obj = ssh_client[0]
-
+            
+            # ATTEMPT CONNECTION HERE
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            hostname = db_obj['hostname']
+            username = db_obj['username']
+            password = "*pEople4"
             try:
+                print "[*] Connecting to " + hostname + " ..." 
+                ssh.connect(hostname, int(db_obj['port']), username=username, password=password)
+        
+                ret = {
+                    'result': True,
+                }
+
                 app.config['CLIENTS_COLLECTION'].update({'hostname':hostname, 'email':email}, {
                     'username':db_obj['username'],
                     'name':db_obj['name'],
@@ -234,6 +209,7 @@ def betaconnect():
                     '_id':db_obj['_id'],
                     'port':db_obj['port']      
                     })
+
                 ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
                 
                 if ssh_client is not None:
@@ -249,9 +225,11 @@ def betaconnect():
                     print "Not found"
                     ret = {'result':False}
 
-            except Exception, e:
-                print str(e)
+            except paramiko.SSHException:
+                print "[-] Connection failed"
                 ret = {'result': False}
+
+            
         else:
             print "Host not found in DB"
             ret = {'result': False}

@@ -13,7 +13,6 @@ angular.module('myApp.SSHClientService', [])
         connect: connect,
         disconnect: disconnect,
         getServers: getServers,
-        betaConnect: betaConnect,
         betaDisconnect: betaDisconnect,
         getClientsList: getClientsList
     };
@@ -60,32 +59,6 @@ angular.module('myApp.SSHClientService', [])
 
         return deferred.promise;
     }
-
-    function connect(hostname, username, password, port){
-        var deferred = $q.defer();
-
-        $http.post('/connect', {
-            hostname: hostname, 
-            username:username,
-            password:password,
-            port:port
-        })
-        .success(function(data, status){
-            if (status == 200 && data.result){
-                client_id = data.id;
-                clients.push({'id':client_id})
-                console.log("[*] Connected to " + client_id)
-                deferred.resolve();      
-            } else {
-                deferred.reject();
-            }
-        })
-        .error(function(data){
-            deferred.reject();
-        });
-
-        return deferred.promise;
-    }
     
     function disconnect(hostname){
         var deffered = $q.defer();
@@ -107,7 +80,7 @@ angular.module('myApp.SSHClientService', [])
         return deferred.promise;
     }
 
-    function betaConnect(hostname, username, port, email){
+    function connect(hostname, username, port, email){
         console.log("[DEBUG] Processing " + hostname + " " + username)
         var deferred = $q.defer();
 
@@ -118,7 +91,7 @@ angular.module('myApp.SSHClientService', [])
             'email': email
         }
 
-        $http.post('/betaconnect', c)
+        $http.post('/connect', c)
         .success(function(data){
             if (data.result){
                 console.log("[*] Adding " + c.hostname + " to clients list")

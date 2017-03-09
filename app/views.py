@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from app import app, lm
 from flask import send_file, request, redirect, render_template, url_for, flash, json
@@ -18,7 +18,6 @@ class JSONEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, o)
 
-ssh = []
 
 @app.route('/')
 def index():
@@ -116,6 +115,7 @@ def load_user(email):
         return None
     return User(u['_id'])
 
+
 @app.route('/addserver', methods=['POST'])
 @login_required
 def add_server():
@@ -129,16 +129,16 @@ def add_server():
     port     = data['port']
     email    = data['email']
     
-    print "[*] Adding new server for ", email
     try:
         collection.insert({
             "hostname": hostname,
             "name": name,
             "username" : username,
             "port" : port,
-            "email": email
+            "email": email,
+            "up": False
             })   
-        print "[*] Client added : ", hostname
+        print "[*] Client added : " + hostname + " for " + email
         ret = {'result': True}
     except pymongo.errors.DuplicateKeyError, e:
         print str(e)
@@ -205,6 +205,141 @@ def connect():
         ret = {'result': False}
 
     return json.dumps(ret)
+
+
+@app.route('/betaconnect', methods=['POST'])
+@login_required
+def betaconnect():
+
+    data = json.loads(request.data.decode())
+
+    hostname = data['hostname']
+    email    = data['email']
+
+    try:
+        ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
+        if ssh_client is not None:
+            
+            # ATTEMPT CONNECTION HERE
+
+            db_obj = ssh_client[0]
+
+            try:
+                app.config['CLIENTS_COLLECTION'].update({'hostname':hostname, 'email':email}, {
+                    'username':db_obj['username'],
+                    'name':db_obj['name'],
+                    'hostname':db_obj['hostname'],
+                    'up':True,
+                    'email':db_obj['email'],
+                    '_id':db_obj['_id'],
+                    'port':db_obj['port']      
+                    })
+                ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
+                
+                if ssh_client is not None:
+                    print "[DEBUG] " + ssh_client[0]['hostname'] + " up ? " + str(ssh_client[0]['up'])
+                    
+                    if ssh_client[0]['up'] == True:
+                        ret = {'result':True}
+                        print "Connected to " + hostname
+                    else:
+                        print "Something went wrong while updating client status in DB"                    
+                        ret = {'result': False}
+                else:
+                    print "Not found"
+                    ret = {'result':False}
+
+            except Exception, e:
+                print str(e)
+                ret = {'result': False}
+        else:
+            print "Host not found in DB"
+            ret = {'result': False}
+    except Exception, e:
+        print str(e)
+        ret = {'result': False}
+
+
+    return json.dumps(ret)
+
+
+@app.route('/betadisconnect', methods=['POST'])
+@login_required
+def betadisconnect():
+    data = json.loads(request.data.decode())
+
+    hostname = data['hostname']
+    email    = data['email']
+
+    try:
+        ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
+        
+        if ssh_client is not None:
+            db_obj = ssh_client[0]
+            
+            if db_obj['up'] == False:
+                ret = {'result':False}
+                print "Not connected to this server"
+            else:
+                try:
+                    app.config['CLIENTS_COLLECTION'].update({'hostname':hostname, 'email':email}, {
+                        'username':db_obj['username'],
+                        'name':db_obj['name'],
+                        'hostname':db_obj['hostname'],
+                        'up':False,
+                        'email':db_obj['email'],
+                        '_id':db_obj['_id'],
+                        'port':db_obj['port']      
+                        })
+                    ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
+                    
+                    if ssh_client is not None:
+                        ret = {'result':True}
+                        print "Host " + hostname + " disconnected"
+
+                    else:
+                        ret = {'result':False}
+                        print "Failed to disconnect"
+
+                except Exception, e:
+                    print str(e)
+                    ret = {'result': False}
+            
+        else:
+            print "Not found in DB"
+
+    except Exception, e:
+        print str(e)
+        ret = {'result':False}
+
+    return json.dumps(ret)
+
+
+@app.route('/getclientslist', methods=['POST'])
+@login_required
+def getclientslist():
+    
+    data = json.loads(request.data.decode())
+
+    email = data['email']
+
+    try:
+        clients = app.config['CLIENTS_COLLECTION'].find({'email': email, 'up':True})
+
+        if clients is not None:
+            ret = [{'result':True}]
+            for c in clients:
+                ret.append(c)
+        else:
+            ret = {'result':False}
+
+    except Exception, e:
+        print str(e)
+        ret = {'result': False}
+
+    return JSONEncoder().encode(ret)
+
+
 
 
 # @app.route('/disconnect/:id', methods=['POST'])

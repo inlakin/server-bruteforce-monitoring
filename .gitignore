@@ -2,3 +2,4 @@ res/
 app/*.pyc
 *.pyc
 *.txt
+.gitold/

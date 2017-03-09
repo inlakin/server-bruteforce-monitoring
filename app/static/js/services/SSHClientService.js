@@ -1,6 +1,10 @@
 angular.module('myApp.SSHClientService', [])
 
-.factory('SSH', ['$q', '$timeout', '$http', function($q, $timeout, $http){
+.factory('SSH', [
+    '$q',
+    '$timeout', 
+    '$http', 
+    function($q, $timeout, $http){
 
     var clients = [];
 
@@ -8,7 +12,10 @@ angular.module('myApp.SSHClientService', [])
         addServer: addServer,
         connect: connect,
         disconnect: disconnect,
-        getServers: getServers
+        getServers: getServers,
+        betaConnect: betaConnect,
+        betaDisconnect: betaDisconnect,
+        getClientsList: getClientsList
     };
 
     function addServer(name, hostname, username, port, email){
@@ -25,10 +32,10 @@ angular.module('myApp.SSHClientService', [])
             if (status == 200 && data.result){
                 deferred.resolve();
             } else {
-                deferred.reject("Error : Server already exist in DB")
+                deferred.reject()
             }
         })
-        .error(function(data){
+        .error(function(){
             deferred.reject();
         });
 
@@ -52,7 +59,6 @@ angular.module('myApp.SSHClientService', [])
         })
 
         return deferred.promise;
-
     }
 
     function connect(hostname, username, password, port){
@@ -99,5 +105,94 @@ angular.module('myApp.SSHClientService', [])
         });
 
         return deferred.promise;
+    }
+
+    function betaConnect(hostname, username, port, email){
+        console.log("[DEBUG] Processing " + hostname + " " + username)
+        var deferred = $q.defer();
+
+        c = {
+            'hostname':hostname, 
+            'username':username, 
+            'port':port,
+            'email': email
+        }
+
+        $http.post('/betaconnect', c)
+        .success(function(data){
+            if (data.result){
+                console.log("[*] Adding " + c.hostname + " to clients list")
+                clients.push(c);
+                deferred.resolve()    
+            } else {
+                deferred.reject();
+            }
+        })
+        .error(function(){
+            deferred.reject()
+        })
+
+        return deferred.promise;
+    }
+
+    function betaDisconnect(hostname, email){
+        
+        var deferred = $q.defer()
+
+        $http.post('/betadisconnect', {'hostname':hostname, 'email':email})
+        .success(function(data){
+            if (data.result){
+                console.log('[DEBUG] Disconnected')
+                deferred.resolve()
+            }else {
+                deferred.reject()
+                console.log("[DEBUG] Not connected to this server")
+            }
+        })
+        .error(function(){
+            console.log('[DEBUG] Fail disconnecting')
+            deferred.reject()
+        })
+
+        return deferred.promise;
+    }
+
+    function getClientsList(email){
+        var deferred = $q.defer();
+        clients = [] 
+        $http.post('/getclientslist', {'email':email})
+        .success(function(data){
+            if(data[0].result){
+                var i = 0;
+                for (i = 1 ; i < data.length; i++){
+                    c = [];
+
+                    c['name']     = data[i]['name'];
+                    c['hostname'] = data[i]['hostname'];
+                    c['username'] = data[i]['username'];
+                    c['port']     = data[i]['port'];
+
+                    clients.push(c);
+                }    
+                deferred.resolve(clients)
+            } else {
+                console.log('[DEBUG] Clients list empty')
+                deferred.reject()
+            }
+        })
+        .error(function(){
+            deferred.reject()
+        })
+
+        return deferred.promise;
+
+        // if (clients.length == 0){
+        //     deferred.reject();
+        //     console.log("[*] Not connected to any clients")
+        // } else {
+        //     deferred.resolve(clients);
+        //     console.log("[*] Clients sent")
+        // }
+        // return deferred.promise;
     }
 }])

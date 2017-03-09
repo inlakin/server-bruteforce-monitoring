@@ -42,9 +42,13 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     
     errorMessage   = "";
     successMessage = "";
+    
+    $scope.connected = true;
 
-    $scope.servers = [];
-    $scope.user = "";
+    $scope.servers   = [];
+    $scope.user      = "";
+    $scope.serversUp = [];
+
 
     $scope.getServer = function(){
         SSH.getServers($scope.user)
@@ -68,6 +72,8 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     
     $scope.addServer = function(){
 
+        // Need to check first connection before adding 
+        // 
        SSH.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user)
         .then(function(){
             $scope.success        = true;
@@ -88,7 +94,92 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     }
 
     $scope.connect = function(username, hostname, port){
-        console.log("[*] Connecting to " + username + "@" + hostname + ":" + port)
+        // $scope.connected = true;
+        connect = false;
+        email = $scope.user;
+
+        if ($scope.serversUp.length == 0){
+
+            SSH.betaConnect(hostname, username, port, email)
+            .then(function(){
+                console.log("[DEBUG] Connected")
+                $scope.serversUp.push({'hostname':hostname});
+                $scope.connected = true;
+            })
+            .catch(function(){
+                console.log("[DEBUG] Not connected")
+            });
+        } else {
+
+            var i = 0;
+
+            for (i = 0; i < $scope.serversUp.length; i++){
+                if ($scope.serversUp[i].hostname == hostname){
+                    connect = true
+                    break;
+                }
+            }
+
+            if (!connect){
+                console.log("[*] Connecting to " + username + "@" + hostname + ":" + port + " for " + email)
+                
+                SSH.betaConnect(hostname, username, port, email)
+                .then(function(){
+                    console.log("[DEBUG] Connected")
+                    $scope.serversUp.push({'hostname':hostname});
+                    $scope.connected = true;
+                })
+                .catch(function(){
+                    console.log("[DEBUG] Not connected")
+                });
+            } else {
+                console.log('[DEBUG] Already connected to ' + hostname)
+            }
+        }
+    }
+
+    $scope.disconnect = function(hostname){
+        // $scope.connected = false;
+        disconnected = false;
+        nb_loop = $scope.serversUp.length;
+        
+        if ($scope.serversUp.length !== 0){
+            var i = 0;
+            while (disconnected == false && i < nb_loop){
+
+                // Need to fix the poping stuff
+                if ($scope.serversUp[i] !== undefined){
+                    if($scope.serversUp[i].hostname == hostname){
+                        SSH.betaDisconnect(hostname, $scope.user)
+                        .then(function(){
+                            //  FIX FOLLOWING LINE 
+                            $scope.serversUp.pop(i);
+                            disconnected = true;    
+                        })
+                        .catch(function(){
+                            console.log("Catched")
+                        });
+                    }
+                }
+                i++;   
+            }
+        } 
+    }
+
+    $scope.getServersUp = function(){
+        
+        SSH.getClientsList($scope.user)
+        .then(function(data){
+            $scope.serversUp = [];
+            for (var i = 0 ; i<data.length; i++){
+                var client = {'hostname':data[i].hostname}
+                console.log("[DEBUG] Adding " + client.hostname + " to servers up")
+                $scope.serversUp.push(client)
+            }
+        })
+        .catch(function(){
+            console.log("[*] Failed")
+        })
     }
 
     $scope.deleteServer = function(username, hostname, port){
@@ -96,16 +187,22 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     }
 
     $scope.refreshServer = function(){
-        $scope.servers = [];
-        $scope.getServer($scope.user);
+
+        $scope.servers   = [];
+        $scope.serversUp = [];
+
+        $scope.getServer();
+        $scope.getServersUp();
     }
 
-    if (AuthService.getUser() == "") {
-        console.log("[*] getUser() : "+AuthService.getUser());
+    $scope.user = AuthService.getUser()
+
+    if ($scope.user !== "") {
+        console.log("[*] getUser() : "+ AuthService.getUser());
+        $scope.refreshServer()
     } else {
-        $scope.user = AuthService.getUser();
-        console.log("[*] getUser() " + $scope.user);
-        $scope.getServer($scope.user);
+        console.log("[*] User not found");
+        $state.go('home');
     }
     
 }])

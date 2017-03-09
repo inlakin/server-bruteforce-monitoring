@@ -117,22 +117,4 @@ angular.module('myApp.AuthenticationService', [])
             return ""
         }
     }
-
-    //     var deferred = $q.defer()
-
-    //     $http.get('/getuser')
-    //     .success(function(data, status){
-    //         if (status == 200 && data.result){
-    //             deferred.resolve(data.user_id)
-    //             console.log('[*] User fetched ' + data.user_id)
-    //         } else {
-    //             deferred.reject()
-    //             console.log('[*] Failed to fetch user id')
-    //         }
-    //     })
-    //     .error(function(data){
-    //         deferred.reject()
-    //         console.log('[*] Oups something went wrong while fetching user')            
-    //     })
-    // }
 }]);

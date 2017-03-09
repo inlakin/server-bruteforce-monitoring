@@ -1,9 +1,4 @@
-<style type="text/css">
-    .terminal-container{
-        height: 200px;
-        box-shadow: 0.5em 0.5em 0.5em 0 gray;
-    }
-</style>
+<div class="margin-top"></div>
 
 <div class="row">
     <div class="col-md-4"></div>
@@ -14,7 +9,25 @@
 </div>
 
 <div class="row">
-    <div class="col-md-2"></div>
+    <div class="col-md-2">
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Hostname</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="s in serversUp track by $index">
+                    <th scope="row">{{$index+1}}</th>
+                    <th>{{s.hostname}}</th>
+                </tr>
+            </tbody>
+        </table>
+
+
+    </div>
     <div class="col-md-8">
         <table class="table">
             <thead>
@@ -34,25 +47,27 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="s in servers track by $index">
-                    <th scope="row">{{$index+1}}</th>
-                    <td> {{s.name}} </td>
-                    <td> {{s.hostname}} </td>
-                    <td> {{s.username}} </td>
-                    <td> {{s.port}} </td>
-                    <td "> 
-                        <span ng-click="connect(s.username, s.hostname, s.port)" class="glyphicon glyphicon-play icon icon-connect"> Connect</span>
-                    </td>
-                    <td> 
-                        <span ng-click="edit()" class="glyphicon glyphicon-edit icon icon-edit"> Edit</span>
-                    </td>
-                    <td>
-                        <span ng-click="deleteServer(s.username, s.hostname, s.port)" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
-                     </td>
-                    <td>
-                        <span ng-click="viewmap()" class="glyphicon glyphicon-globe icon icon-globe"> View map</span> 
-                     </td>
-                </tr>
+                    <tr ng-repeat="s in servers track by $index">
+                        <th scope="row">{{$index+1}}</th>
+                        <td> {{s.name}} </td>
+                        <td> {{s.hostname}} </td>
+                        <td> {{s.username}} </td>
+                        <td> {{s.port}} </td>
+                        <td> 
+                            <span ng-hide="connected" ng-click="connect(s.username, s.hostname, s.port)" class="glyphicon glyphicon-play icon icon-connect"> Connect</span>
+                            <span ng-show="connected" ng-click="disconnect(s.hostname)" class="glyphicon glyphicon-stop icon icon-disconnect"> Disconnect</span>
+                            <span ng-click="connect(s.username, s.hostname, s.port)" class="glyphicon glyphicon-pause icon icon-disconnect"> Pause</span>
+                        </td>
+                        <td> 
+                            <span ng-click="edit()" class="glyphicon glyphicon-edit icon icon-edit"> Edit</span>
+                        </td>
+                        <td>
+                            <span ng-click="deleteServer(s.username, s.hostname, s.port)" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
+                         </td>
+                        <td>
+                            <span ng-click="viewmap()" class="glyphicon glyphicon-globe icon icon-globe"> View map</span> 
+                         </td>
+                    </tr>
             </tbody>
         </table>
 
@@ -74,7 +89,7 @@
                                     <input type="text" name="server-name" class="form-control" ng-model="serverForm.name">
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">Server adress or IP</label>
+                                    <label class="control-label">Hostname</label>
                                     <input type="text" name="server-hostname" class="form-control" ng-model="serverForm.hostname">
                                 </div>
                                 <div class="form-group">
@@ -105,39 +120,10 @@
 <!-- 
 <div class="row">
     <div class="col-md-1"></div>
-    <div class="col-md-5">
+    <div class="col-md-10">
         <div class="terminal-container" angular-terminal="main"></div>
     </div>
-
     <div class="col-md-1"></div>
-    <div class="col-md-4">
-        <h3>Mettre à jour mes informations</h3>
-        <div class="">
-            <table class="table">
-                <tbody>
-                    <tr>
-                        <th>Username</th>
-                        <th>{{username}}</th>
-                    </tr>              
-                    <tr>
-                        <th>Email</th>
-                        <th>{{email}}</th>
-                    </tr>             
-                    <tr>
-                        <th>New password</th>
-                        <th><input type="password" name="new_pass"></th>
-                    </tr>             
-                    <tr>
-                        <th>Confirm new password</th>
-                        <th><input type="password" name="confirm_new_pass"></th>
-                    </tr>             
-                </tbody>
-            </table>
-            <button class="btn btn-primary">Update</button>
-        </div>
-    <div class="col-md-1"></div>
-
-    </div>
-</div> -->
-
+</div>
+-->
 

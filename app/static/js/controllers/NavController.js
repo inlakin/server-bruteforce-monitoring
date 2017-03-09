@@ -14,16 +14,9 @@ angular.module('myApp')
         $scope.loggedIn = false;
         $scope.userEmail = "";
 
-        console.log("Logged in : " + $scope.loggedIn)
-        console.log("User email " + $scope.userEmail)
-
     } else {
         $scope.loggedIn = true;
         $scope.userEmail = AuthService.getUser();
-
-        console.log("Logged in : " + $scope.loggedIn)
-        console.log("User email " + $scope.userEmail)
-
     }
 
     $scope.logout = function () {

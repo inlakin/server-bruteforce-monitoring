@@ -326,30 +326,6 @@ def betadisconnect():
     return json.dumps(ret)
 
 
-@app.route('/getclientslist', methods=['POST'])
-@login_required
-def getclientslist():
-    
-    data = json.loads(request.data.decode())
-
-    email = data['email']
-
-    try:
-        clients = app.config['CLIENTS_COLLECTION'].find({'email': email, 'up':True})
-
-        if clients is not None:
-            ret = [{'result':True}]
-            for c in clients:
-                ret.append(c)
-        else:
-            ret = {'result':False}
-
-    except Exception, e:
-        print str(e)
-        ret = {'result': False}
-
-    return JSONEncoder().encode(ret)
-
 @app.route('/deleteServer', methods=['POST'])
 @login_required
 def deleteServer():

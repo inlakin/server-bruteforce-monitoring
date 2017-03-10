@@ -51,30 +51,29 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     'AuthService',
     function($scope, $state, $http, SSH, AuthService){
     
-    errorMessage   = "";
-    successMessage = "";
-    
-    $scope.connected = true;
-
-    $scope.servers   = [];
     $scope.user      = "";
+    errorMessage     = "";
+    successMessage   = "";
+    $scope.connected = true;
+    $scope.servers   = [];
     $scope.serversUp = [];
 
 
-    $scope.getServer = function(){
+    $scope.getServers = function(){
 
         SSH.getServers($scope.user)
         .then(function(data){
             
             $scope.servers   = [];
+            $scope.serversUp = [];
 
             for (var i=1; i < data.length;i++){
                 s = []
-
                 s['name']      = data[i]['name'];
                 s['hostname']  = data[i]['hostname'];
                 s['username']  = data[i]['username'];
                 s['port']      = data[i]['port'];
+
                 if (data[i]['up']){
                     s['connected'] = true;
                     $scope.serversUp.push({'hostname':s['hostname']})
@@ -100,17 +99,17 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             $scope.successMessage = "Server added"
             $scope.serverForm     = {}
             $scope.disabled       = false
+
             console.log("[*] Server added");
-            // Need to dismiss the modal
-            //  $state.reload()
-            $scope.getServer()
             
+            $scope.getServers()
         })
         .catch(function(){
             $scope.error        = true;
             $scope.errorMessage = "Failed to add server"
             $scope.serverForm   = {}
             $scope.disabled     = false;
+
             console.log("[*] Failed to add server")
         })
     }
@@ -134,7 +133,6 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
                         $scope.serversUp.splice(j,1)
                         $scope.servers[i].connected = false;
                         break;
-
                     }
                 }
                 break;
@@ -144,7 +142,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
     $scope.connect = function(username, hostname, port){
         connect = false;
-        email = $scope.user;
+        email   = $scope.user;
 
         if ($scope.serversUp.length == 0){
 
@@ -183,25 +181,19 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     }
 
     $scope.disconnect = function(hostname){
-        // $scope.connected = false;
         disconnected = false;
-        nb_loop = $scope.serversUp.length;
         
         if ($scope.serversUp.length !== 0){
             var i = 0;
-            while (disconnected == false && i < nb_loop){
+            while (disconnected == false && i < $scope.serversUp.length){
 
                 if ($scope.serversUp[i] !== undefined){
                     if($scope.serversUp[i].hostname == hostname){
                         SSH.betaDisconnect(hostname, $scope.user)
                         .then(function(){
-                            //  FIX FOLLOWING LINE 
                             $scope.serverDown(hostname)
                             disconnected = true;    
                         })
-                        .catch(function(){
-                            console.log("Catched")
-                        });
                     }
                 }
                 i++;   
@@ -214,25 +206,16 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
         SSH.deleteServer(hostname, $scope.user)
         .then(function(){
-            $scope.getServer()
+            $scope.getServers()
             console.log("[DEBUG] Remove " +hostname+" : success")
         })
-        .catch(function(){
-            console.log("[DEBUG] Something failed")
-        })
-    }
-
-    $scope.refreshServer = function(){
-
-        $scope.serversUp = [];
-        $scope.getServer();
     }
 
     $scope.user = AuthService.getUser()
 
     if ($scope.user !== "") {
         console.log("[*] getUser() : "+ AuthService.getUser());
-        $scope.refreshServer()
+        $scope.getServers()
     } else {
         console.log("[*] User not found");
         $state.go('home');

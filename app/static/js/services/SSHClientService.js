@@ -13,6 +13,7 @@ angular.module('myApp.SSHClientService', [])
         connect: connect,
         disconnect: disconnect,
         getServers: getServers,
+        deleteServer: deleteServer,
         betaDisconnect: betaDisconnect,
         getClientsList: getClientsList
     };
@@ -60,6 +61,29 @@ angular.module('myApp.SSHClientService', [])
         return deferred.promise;
     }
     
+    function deleteServer(hostname, email){
+        var deferred = $q.defer()
+
+        $http.post('/deleteServer', {
+            'hostname':hostname,
+            'email':email
+        })
+        .success(function(data){
+            if(data.result){
+                deferred.resolve();
+                console.log("[DEBUG] Removed from DB : " + hostname);
+            } else {
+                console.log("[DEBUG] Something failed (else)")
+                deferred.reject();
+            }
+        })
+        .error(function(err){
+            console.log("[DEBUG] Something failed (error) : " + err)
+            deferred.reject();
+        })
+
+        return deferred.promise;
+    }
     function disconnect(hostname){
         var deffered = $q.defer();
 
@@ -115,7 +139,7 @@ angular.module('myApp.SSHClientService', [])
         $http.post('/betadisconnect', {'hostname':hostname, 'email':email})
         .success(function(data){
             if (data.result){
-                console.log('[DEBUG] Disconnected')
+                console.log('[DEBUG] Disconnected in DB')
                 deferred.resolve()
             }else {
                 deferred.reject()

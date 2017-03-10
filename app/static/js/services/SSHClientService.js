@@ -14,8 +14,7 @@ angular.module('myApp.SSHClientService', [])
         disconnect: disconnect,
         getServers: getServers,
         deleteServer: deleteServer,
-        betaDisconnect: betaDisconnect,
-        getClientsList: getClientsList
+        betaDisconnect: betaDisconnect
     };
 
     function addServer(name, hostname, username, port, email){
@@ -65,8 +64,8 @@ angular.module('myApp.SSHClientService', [])
         var deferred = $q.defer()
 
         $http.post('/deleteServer', {
-            'hostname':hostname,
-            'email':email
+            hostname:hostname,
+            email:email
         })
         .success(function(data){
             if(data.result){
@@ -84,6 +83,7 @@ angular.module('myApp.SSHClientService', [])
 
         return deferred.promise;
     }
+
     function disconnect(hostname){
         var deffered = $q.defer();
 
@@ -152,44 +152,5 @@ angular.module('myApp.SSHClientService', [])
         })
 
         return deferred.promise;
-    }
-
-    function getClientsList(email){
-        var deferred = $q.defer();
-        clients = [] 
-        $http.post('/getclientslist', {'email':email})
-        .success(function(data){
-            if(data[0].result){
-                var i = 0;
-                for (i = 1 ; i < data.length; i++){
-                    c = [];
-
-                    c['name']     = data[i]['name'];
-                    c['hostname'] = data[i]['hostname'];
-                    c['username'] = data[i]['username'];
-                    c['port']     = data[i]['port'];
-
-                    clients.push(c);
-                }    
-                deferred.resolve(clients)
-            } else {
-                console.log('[DEBUG] Clients list empty')
-                deferred.reject()
-            }
-        })
-        .error(function(){
-            deferred.reject()
-        })
-
-        return deferred.promise;
-
-        // if (clients.length == 0){
-        //     deferred.reject();
-        //     console.log("[*] Not connected to any clients")
-        // } else {
-        //     deferred.resolve(clients);
-        //     console.log("[*] Clients sent")
-        // }
-        // return deferred.promise;
     }
 }])

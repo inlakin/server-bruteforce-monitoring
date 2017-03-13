@@ -1,8 +1,19 @@
 angular.module('myApp')
 
-.controller('MapCtrl', function($scope, $http, ProfilesService){
+.controller('PanelCtrl', [
+    '$scope',
+    '$http',
+    'ProfilesService',
+    'AuthService',
+    function($scope, $http, ProfilesService, AuthService){
 
-  console.log('Map Controller')
+    $scope.server    = ""
+    $scope.user      = AuthService.getUser()
+    $scope.isFetched = false;
+    $scope.showMap   = false;
+
+    console.log("PanelCtrl : "+$scope.user)
+
 //   get_profiles = ProfilesService.getProfiles();
 //   $scope.profiles = get_profiles
 
@@ -45,4 +56,4 @@ angular.module('myApp')
 
     
 //   $scope.createMarkers();
-})
+}])

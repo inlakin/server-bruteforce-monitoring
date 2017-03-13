@@ -1,3 +1,14 @@
+// $scope.initScope = function(){
+//      // Do Stuff
+//      $scope.user = "";
+//      $scope.isLoggedIn = true;
+// }
+// 
+// 
+// $scope.on('$routeChangeUpdate', initScope)
+// $scope.on('$routeChangeSuccess', initScope)
+// 
+
 /**
 * myApp.UserProfil Module
 *
@@ -51,16 +62,25 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
 
     $scope.getServer = function(){
+
         SSH.getServers($scope.user)
         .then(function(data){
+            
+            $scope.servers   = [];
 
             for (var i=1; i < data.length;i++){
                 s = []
 
-                s['name']     = data[i]['name'];
-                s['hostname'] = data[i]['hostname'];
-                s['username'] = data[i]['username'];
-                s['port']     = data[i]['port'];
+                s['name']      = data[i]['name'];
+                s['hostname']  = data[i]['hostname'];
+                s['username']  = data[i]['username'];
+                s['port']      = data[i]['port'];
+                if (data[i]['up']){
+                    s['connected'] = true;
+                    $scope.serversUp.push({'hostname':s['hostname']})
+                } else {
+                    s['connected'] = false;
+                }
 
                 $scope.servers.push(s)
             }
@@ -83,6 +103,8 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             console.log("[*] Server added");
             // Need to dismiss the modal
             //  $state.reload()
+            $scope.getServer()
+            
         })
         .catch(function(){
             $scope.error        = true;
@@ -93,8 +115,34 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
         })
     }
 
+    $scope.serverUp = function(hostname){
+        for(var i = 0; i < $scope.servers.length; i++){
+            console.log('[DEBUG] Looking for a match with ' + $scope.servers[i].hostname)
+            if($scope.servers[i].hostname === hostname){
+                $scope.servers[i].connected = true;
+                $scope.serversUp.push({'hostname':hostname})
+                break;
+            }
+        }
+    }
+
+    $scope.serverDown = function(hostname){
+        for (var i = 0; i < $scope.servers.length; i++){
+            if($scope.servers[i].hostname === hostname){
+                for(var j = 0; j < $scope.serversUp.length; j++){
+                    if($scope.serversUp[j].hostname === hostname){
+                        $scope.serversUp.splice(j,1)
+                        $scope.servers[i].connected = false;
+                        break;
+
+                    }
+                }
+                break;
+            }
+        }
+    }
+
     $scope.connect = function(username, hostname, port){
-        // $scope.connected = true;
         connect = false;
         email = $scope.user;
 
@@ -103,17 +151,14 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             SSH.betaConnect(hostname, username, port, email)
             .then(function(){
                 console.log("[DEBUG] Connected")
-                $scope.serversUp.push({'hostname':hostname});
-                $scope.connected = true;
+                $scope.serverUp(hostname)
             })
             .catch(function(){
                 console.log("[DEBUG] Not connected")
             });
         } else {
 
-            var i = 0;
-
-            for (i = 0; i < $scope.serversUp.length; i++){
+            for (var i = 0; i < $scope.serversUp.length; i++){
                 if ($scope.serversUp[i].hostname == hostname){
                     connect = true
                     break;
@@ -123,11 +168,10 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             if (!connect){
                 console.log("[*] Connecting to " + username + "@" + hostname + ":" + port + " for " + email)
                 
-                SSH.betaConnect(hostname, username, port, email)
+                SSH.connect(hostname, username, port, email)
                 .then(function(){
                     console.log("[DEBUG] Connected")
-                    $scope.serversUp.push({'hostname':hostname});
-                    $scope.connected = true;
+                    $scope.serverUp(hostname)
                 })
                 .catch(function(){
                     console.log("[DEBUG] Not connected")
@@ -147,13 +191,12 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             var i = 0;
             while (disconnected == false && i < nb_loop){
 
-                // Need to fix the poping stuff
                 if ($scope.serversUp[i] !== undefined){
                     if($scope.serversUp[i].hostname == hostname){
                         SSH.betaDisconnect(hostname, $scope.user)
                         .then(function(){
                             //  FIX FOLLOWING LINE 
-                            $scope.serversUp.pop(i);
+                            $scope.serverDown(hostname)
                             disconnected = true;    
                         })
                         .catch(function(){
@@ -166,33 +209,23 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
         } 
     }
 
-    $scope.getServersUp = function(){
-        
-        SSH.getClientsList($scope.user)
-        .then(function(data){
-            $scope.serversUp = [];
-            for (var i = 0 ; i<data.length; i++){
-                var client = {'hostname':data[i].hostname}
-                console.log("[DEBUG] Adding " + client.hostname + " to servers up")
-                $scope.serversUp.push(client)
-            }
+    $scope.deleteServer = function(hostname){
+        console.log("[*] Deleting " + hostname + " for user " + $scope.user)
+
+        SSH.deleteServer(hostname, $scope.user)
+        .then(function(){
+            $scope.getServer()
+            console.log("[DEBUG] Remove " +hostname+" : success")
         })
         .catch(function(){
-            console.log("[*] Failed")
+            console.log("[DEBUG] Something failed")
         })
-    }
-
-    $scope.deleteServer = function(username, hostname, port){
-        console.log("[*] Deleting " + username + "@" + hostname + ":" + port)
     }
 
     $scope.refreshServer = function(){
 
-        $scope.servers   = [];
         $scope.serversUp = [];
-
         $scope.getServer();
-        $scope.getServersUp();
     }
 
     $scope.user = AuthService.getUser()

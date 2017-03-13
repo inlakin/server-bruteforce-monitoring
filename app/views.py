@@ -221,7 +221,18 @@ def betaconnect():
         if ssh_client is not None:
             
             # ATTEMPT CONNECTION HERE
-
+            # ssh = paramiko.SSHClient()
+            # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            # hostname = db_obj['hostname']
+            # username = db_obj['username']
+            
+            try:
+                print "[*] Connecting to " + hostname + " ..." 
+                # ssh.connect(hostname, int(db_obj['port']), username=username, password=password)
+        
+                ret = {
+                    'result': True,
+                }
             db_obj = ssh_client[0]
 
             try:
@@ -339,12 +350,29 @@ def getclientslist():
 
     return JSONEncoder().encode(ret)
 
+@app.route('/deleteServer', methods=['POST'])
+@login_required
+def deleteServer():
+    data = json.loads(request.data.decode())
+
+    hostname = data['hostname']
+    email    = data['email']
+
+    print "[*] Removing " + hostname + " from DB ..."
+
+    try:
+        app.config['CLIENTS_COLLECTION'].remove({'hostname':hostname, 'email':email})
+        print "... done"
+        ret = {'result' : True}
+    except Exception, e:
+        print str(e)
+        ret = {'result': False}
+        print "... failed !"
 
 
+    return json.dumps(ret)
 
-# @app.route('/disconnect/:id', methods=['POST'])
-# @login_required
-# def disconnect()
+
 
 
 # @app.route("/exec", methods=['POST'])

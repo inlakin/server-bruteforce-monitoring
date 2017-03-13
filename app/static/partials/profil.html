@@ -64,7 +64,7 @@
                             <span ng-click="deleteServer(s.hostname)" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
                          </td>
                         <td>
-                            <span ng-click="viewmap()" class="glyphicon glyphicon-globe icon icon-globe"> View map</span> 
+                            <span ng-show="s.connected" ng-click="accessPanel(s.hostname)" class="glyphicon glyphicon-globe icon icon-globe">Access panel</span> 
                          </td>
                     </tr>
             </tbody>

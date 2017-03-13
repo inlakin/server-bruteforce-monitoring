@@ -65,10 +65,10 @@ angular.module('myApp', [
             // data : {requiresLogin : true }
             authenticate: true
         })
-        .state('map', {
-            url:'/map',
-            templateUrl:'/static/partials/map.html',
-            controller:'MapCtrl',
+        .state('panel', {
+            url:'/panel',
+            templateUrl:'/static/partials/panel.html',
+            controller:'PanelCtrl',
             authenticate: true
         })
 

@@ -211,6 +211,12 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
         })
     }
 
+    $scope.accessPanel = function(hostname){
+        console.log('[DEBUG] Accessing panel for ' + hostname)
+
+        $state.go('panel')
+
+    }
     $scope.user = AuthService.getUser()
 
     if ($scope.user !== "") {

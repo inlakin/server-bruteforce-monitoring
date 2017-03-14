@@ -11,6 +11,8 @@ angular.module('myApp')
     $scope.user            = AuthService.getUser()
     $scope.bruteforce_list = []
 
+    var isFetched = false;
+
     $scope.options = {
             "bruteforce_attempts": false,
             "map_active":false
@@ -25,16 +27,29 @@ angular.module('myApp')
     }
 
     $scope.fetchBruteforceList = function(){
-        ProfilesService.setBruteforceList($scope.user, $scope.server)
-        .then(function(data){
-            console.log("[DEBUG] Success fetching attemps")
+        var error = false;
+        console.log("[DEBUG] isfetched : " + isFetched)
+        if (!isFetched){
+            ProfilesService.setBruteforceList($scope.user, $scope.server)
+            .then(function(data){
+                console.log("[DEBUG] Success fetching attemps")
+                $scope.options.bruteforce_attempts = ($scope.options.bruteforce_attempts) ? false : true;
+                isFetched = true;
+            })
+            .catch(function(){
+                console.log("[DEBUG] failed fetching attemps")
+                $scope.options.bruteforce_attempts = false;
+                error = true;
+            })    
+        } else {
             $scope.options.bruteforce_attempts = ($scope.options.bruteforce_attempts) ? false : true;
+        }
+
+        if(!error){
+            $scope.bruteforce_list = []
             $scope.bruteforce_list = ProfilesService.getBruteforceList();
-        })
-        .catch(function(){
-            console.log("[DEBUG] failed fetching attemps")
-            $scope.options.bruteforce_attempts = false;
-        })
+        }
+        
     }
 //   get_profiles = ProfilesService.getProfiles();
 //   $scope.profiles = get_profiles

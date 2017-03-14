@@ -6,11 +6,14 @@ from app import app, lm
 from flask import send_file, request, redirect, render_template, url_for, flash, json
 from flask_login import login_user, logout_user, login_required, current_user
 from pymongo import MongoClient
-import pymongo
 from .user import User
 from werkzeug.security import generate_password_hash
 from bson import ObjectId
+
+import pymongo
 import paramiko
+
+import geoip2.database
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -317,7 +320,66 @@ def deleteServer():
     return json.dumps(ret)
 
 
+@app.route('/exec_cmd', methods=['POST'])
+@login_required
+def exec_cmd():
 
+    # data = json.loads(request.data.decode())
+
+    # email    = data['email']
+    # hostname = data['hostname']
+    # cmd      = data['cmd']
+
+
+    # print "CMD : ", cmd, " for ", email, " at ", hostname
+    # reader = geoip2.database.Reader('GeoLite2-City.mmdb')
+
+    file = open('./app/res/ip_auth_uniq.txt', "r")
+    
+    bruteforce_ip_list = []
+    nb_ip              = 0
+
+    for ip in file:
+        r = {}
+        nb_ip += 1
+        if ip[0] == "0":
+            # try:
+                # response = reader.city(ip[1:].strip('\n'))
+                # r['ip']          = ip[1:].strip('\n')
+                # r['country']     = response.country.name
+                # r['city']        = response.city.name
+                # r['postal_code'] = response.postal.code
+                # r['latitude']    = response.location.latitude
+                # r['longitude']   = response.location.longitude
+                # bruteforce_ip_list.append(r)
+            # except Exception, e:
+            #   print str(e)
+            r['ip'] = ip[1:].strip('\n')
+        else:
+            # try:
+                # response = reader.city(ip.strip('\n'))
+                # r['ip']          = ip.strip('\n')
+                # r['country']     = response.country.name
+                # r['city']        = response.city.name
+                # r['postal_code'] = response.postal.code
+                # r['latitude']    = response.location.latitude
+                # r['longitude']   = response.location.longitude
+                # bruteforce_ip_list.append(r)
+            # except Exception, e:
+            #   print str(e)
+            r['ip'] = ip.strip('\n')
+
+        bruteforce_ip_list.append(r)
+
+    print "Found " + str(nb_ip) + " ip(s)"
+   
+
+
+    ret = [{'result': True}]
+    ret.append(bruteforce_ip_list)
+
+    file.close()
+    return json.dumps(ret)
 
 # @app.route("/exec", methods=['POST'])
 # def exec(request):

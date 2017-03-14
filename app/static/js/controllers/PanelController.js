@@ -6,14 +6,36 @@ angular.module('myApp')
     'ProfilesService',
     'AuthService',
     function($scope, $http, ProfilesService, AuthService){
+    
+    $scope.server          = "default.vps.fr"
+    $scope.user            = AuthService.getUser()
+    $scope.bruteforce_list = []
 
-    $scope.server    = ""
-    $scope.user      = AuthService.getUser()
-    $scope.isFetched = false;
-    $scope.showMap   = false;
+    $scope.options = {
+            "bruteforce_attempts": false,
+            "map_active":false
+    }
+    
+    console.log("[DEBUG] Options: ")
+    console.log("\tBruteforce attempts : " + $scope.options.bruteforce_attempts)
+    console.log("\tMap Active          : " + $scope.options.map_active)
 
-    console.log("PanelCtrl : "+$scope.user)
+    $scope.showMap = function(){
+        $scope.options.map_active = ($scope.options.map_active) ? false : true;
+    }
 
+    $scope.fetchBruteforceList = function(){
+        ProfilesService.setBruteforceList($scope.user, $scope.server)
+        .then(function(data){
+            console.log("[DEBUG] Success fetching attemps")
+            $scope.options.bruteforce_attempts = ($scope.options.bruteforce_attempts) ? false : true;
+            $scope.bruteforce_list = ProfilesService.getBruteforceList();
+        })
+        .catch(function(){
+            console.log("[DEBUG] failed fetching attemps")
+            $scope.options.bruteforce_attempts = false;
+        })
+    }
 //   get_profiles = ProfilesService.getProfiles();
 //   $scope.profiles = get_profiles
 

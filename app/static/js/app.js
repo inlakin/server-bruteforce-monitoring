@@ -12,6 +12,7 @@ angular.module('myApp', [
     'myApp.AuthenticationService',
     'myApp.SSHClientService',
     'myApp.Authentication',
+    'myApp.SSHCmdService',
     'myApp.UserProfil',
     'angular-terminal'
 ])

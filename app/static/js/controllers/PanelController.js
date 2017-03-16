@@ -13,9 +13,10 @@ angular.module('myApp')
     $scope.server          = $stateParams.hostname
     $scope.user            = AuthService.getUser()
     $scope.bruteforce_list = []
-
-    var verified = false;
-    var isFetched = false;
+    $scope.isUp            = false;
+    
+    var verified           = false;
+    var isFetched          = false;
 
     $scope.options = {
             "bruteforce_attempts": false,
@@ -27,6 +28,14 @@ angular.module('myApp')
         .then(function(){
             console.log("[DEBUG] Server Found")
             verified = true;
+            
+            SERVER.isConnected($scope.server, $scope.user)
+            .then(function(){
+                $scope.isUp = true;
+            })
+            .catch(function(){
+                $scope.isUp = false;
+            })
         })
         .catch(function(){
             console.log("[DEBUG] 404 Server Not Found")

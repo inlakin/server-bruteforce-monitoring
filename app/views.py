@@ -347,6 +347,42 @@ def verifyServer():
 
     return json.dumps(ret)
 
+
+@app.route('/isConnected', methods=['POST'])
+@login_required
+def isConnected():
+    data = json.loads(request.data.decode())
+
+    hostname = data['hostname']
+    email    = data['email']
+
+    print "[*] " + email + " @ " + hostname + " is up ?"
+    try:
+        res = app.config['CLIENTS_COLLECTION'].find({
+            'hostname':hostname,
+            'email':email
+            })
+        server = []
+
+        if res is not None:
+            server = res[0]
+            if server['up'] == True:
+                print "Server is up and running"
+                ret = {'result':True}
+            else:
+                print "Server is down"
+                ret = {'result':False}
+        else:
+            print "Server not found"
+            ret = {'result':False}
+    except Exception, e:
+        print str(e)
+        ret = {'result':False}
+
+    return json.dumps(ret)
+
+
+
 @app.route('/exec_cmd', methods=['POST'])
 @login_required
 def exec_cmd():

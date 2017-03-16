@@ -15,7 +15,8 @@ angular.module('myApp.ServerService', [])
         getServers: getServers,
         deleteServer: deleteServer,
         betaDisconnect: betaDisconnect,
-        verify: verify
+        verify: verify,
+        isConnected: isConnected
     };
 
     function addServer(name, hostname, username, port, email){
@@ -176,6 +177,29 @@ angular.module('myApp.ServerService', [])
         .error(function(){
             console.log('[DEBUG] Something horrible happened...')
             deferred.reject()
+        })
+
+        return deferred.promise;
+    }
+
+    function isConnected(server, user){
+        var deferred = $q.defer()
+
+        $http.post('/isConnected', {
+            hostname: server,
+            email: user
+        })
+        .success(function(data){
+            if (data.result){
+                console.log('[DEBUG] Server is up')
+                deferred.resolve()
+            } else {
+                console.log('[DEBUG] Server is down')
+                deferred.reject()
+            }
+        })
+        .error(function(){
+            console.log('[DEBUG] Something horrible happened')
         })
 
         return deferred.promise;

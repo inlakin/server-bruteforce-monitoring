@@ -84,7 +84,7 @@ def register():
     return json.dumps(ret)
 
 
-@app.route('/auth/logout')
+@app.route('/auth/logout', methods=['POST', 'GET'])
 def logout():
     try:
         logout_user()
@@ -319,6 +319,33 @@ def deleteServer():
 
     return json.dumps(ret)
 
+
+@app.route('/verify', methods=['POST'])
+@login_required
+def verifyServer():
+    data = json.loads(request.data.decode())
+
+    hostname = data['hostname']
+    email    = data['email']
+
+    print "[*] Verifying " + email + " @ " + hostname
+    try:
+        res = app.config['CLIENTS_COLLECTION'].find({
+            'hostname':hostname,
+            'email':email
+            })
+        server = []
+
+        if res is not None:
+            server = res[0]
+            ret = {'result':True}
+        else:
+            ret = {'result':False}
+    except Exception, e:
+        print str(e)
+        ret = {'result':False}
+
+    return json.dumps(ret)
 
 @app.route('/exec_cmd', methods=['POST'])
 @login_required

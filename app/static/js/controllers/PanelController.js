@@ -5,19 +5,43 @@ angular.module('myApp')
     '$http',
     'ProfilesService',
     'AuthService',
-    function($scope, $http, ProfilesService, AuthService){
+    '$stateParams',
+    'SERVER',
+    '$state',
+    function($scope, $http, ProfilesService, AuthService, $stateParams, SERVER, $state){
     
-    $scope.server          = "default.vps.fr"
+    $scope.server          = $stateParams.hostname
     $scope.user            = AuthService.getUser()
     $scope.bruteforce_list = []
 
+    var verified = false;
     var isFetched = false;
 
     $scope.options = {
             "bruteforce_attempts": false,
             "map_active":false
     }
-    
+
+    $scope.verifyServer = function(){
+        SERVER.verify($scope.server, $scope.user)
+        .then(function(){
+            console.log("[DEBUG] Server Found")
+            verified = true;
+        })
+        .catch(function(){
+            console.log("[DEBUG] 404 Server Not Found")
+            verified = false;
+        })
+        .finally(function(){
+            if(!verified){
+                $state.go('profil')
+            }
+        })
+    }
+
+    $scope.verifyServer()
+
+    console.log('[DEBUG] $stateParams : \n' + JSON.stringify($stateParams, null, 2))
     console.log("[DEBUG] Options: ")
     console.log("\tBruteforce attempts : " + $scope.options.bruteforce_attempts)
     console.log("\tMap Active          : " + $scope.options.map_active)
@@ -49,7 +73,6 @@ angular.module('myApp')
             $scope.bruteforce_list = []
             $scope.bruteforce_list = ProfilesService.getBruteforceList();
         }
-        
     }
 //   get_profiles = ProfilesService.getProfiles();
 //   $scope.profiles = get_profiles

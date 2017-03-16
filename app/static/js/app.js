@@ -10,7 +10,7 @@ angular.module('myApp', [
     'ui.router',
     'myApp.ProfilesService',
     'myApp.AuthenticationService',
-    'myApp.SSHClientService',
+    'myApp.ServerService',
     'myApp.Authentication',
     'myApp.SSHCmdService',
     'myApp.UserProfil',
@@ -67,7 +67,7 @@ angular.module('myApp', [
             authenticate: true
         })
         .state('panel', {
-            url:'/panel',
+            url:'/panel/:hostname',
             templateUrl:'/static/partials/panel.html',
             controller:'PanelCtrl',
             authenticate: true

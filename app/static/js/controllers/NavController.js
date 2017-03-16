@@ -5,8 +5,8 @@ angular.module('myApp')
     '$http',
     '$state',
     'AuthService',
-    'SSH',
-    function($scope, $http, $state, AuthService, SSH){
+    'SERVER',
+    function($scope, $http, $state, AuthService, SERVER){
     
     $scope.loggedIn = false;
 

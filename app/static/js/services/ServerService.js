@@ -1,6 +1,6 @@
-angular.module('myApp.SSHClientService', [])
+angular.module('myApp.ServerService', [])
 
-.factory('SSH', [
+.factory('SERVER', [
     '$q',
     '$timeout', 
     '$http', 
@@ -14,7 +14,8 @@ angular.module('myApp.SSHClientService', [])
         disconnect: disconnect,
         getServers: getServers,
         deleteServer: deleteServer,
-        betaDisconnect: betaDisconnect
+        betaDisconnect: betaDisconnect,
+        verify: verify
     };
 
     function addServer(name, hostname, username, port, email){
@@ -148,6 +149,32 @@ angular.module('myApp.SSHClientService', [])
         })
         .error(function(){
             console.log('[DEBUG] Fail disconnecting')
+            deferred.reject()
+        })
+
+        return deferred.promise;
+    }
+
+    function verify(server, user){
+        var deferred = $q.defer()
+
+        console.log('[DEBUG] Veriying ' + user + "@" + server + " ...")
+        
+        $http.post('/verify', {
+            hostname:server,
+            email:user
+        })
+        .success(function(data){
+            if(data.result){
+                console.log('[DEBUG] Verified !')
+                deferred.resolve()    
+            } else {
+                console.log('[DEBUG] Not verified ... ')
+                deferred.reject()
+            }
+        })
+        .error(function(){
+            console.log('[DEBUG] Something horrible happened...')
             deferred.reject()
         })
 

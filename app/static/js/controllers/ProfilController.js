@@ -22,7 +22,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
         'List of commands:\n ' +
         '\thelp\t\tprint this menu\n' +
         '\twhoami\t\tprint user info\n' +
-        '\tssh\t\tssh command\n' +
+        '\tSERVER\t\tSERVER command\n' +
         '\tpwd\t\tprint this page\n';
     
     // console.log(terminal_help)
@@ -47,9 +47,9 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     '$scope',
     '$state',
     '$http',
-    'SSH',
+    'SERVER',
     'AuthService',
-    function($scope, $state, $http, SSH, AuthService){
+    function($scope, $state, $http, SERVER, AuthService){
     
     $scope.user      = "";
     errorMessage     = "";
@@ -61,7 +61,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
     $scope.getServers = function(){
 
-        SSH.getServers($scope.user)
+        SERVER.getServers($scope.user)
         .then(function(data){
             
             $scope.servers   = [];
@@ -93,7 +93,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
         // Need to check first connection before adding 
         // 
-       SSH.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user)
+       SERVER.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user)
         .then(function(){
             $scope.success        = true;
             $scope.successMessage = "Server added"
@@ -146,7 +146,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
         if ($scope.serversUp.length == 0){
 
-            SSH.connect(hostname, username, port, email)
+            SERVER.connect(hostname, username, port, email)
             .then(function(){
                 console.log("[DEBUG] Connected")
                 $scope.serverUp(hostname)
@@ -166,7 +166,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
             if (!connect){
                 console.log("[*] Connecting to " + username + "@" + hostname + ":" + port + " for " + email)
                 
-                SSH.connect(hostname, username, port, email)
+                SERVER.connect(hostname, username, port, email)
                 .then(function(){
                     console.log("[DEBUG] Connected")
                     $scope.serverUp(hostname)
@@ -189,7 +189,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
 
                 if ($scope.serversUp[i] !== undefined){
                     if($scope.serversUp[i].hostname == hostname){
-                        SSH.betaDisconnect(hostname, $scope.user)
+                        SERVER.betaDisconnect(hostname, $scope.user)
                         .then(function(){
                             $scope.serverDown(hostname)
                             disconnected = true;    
@@ -204,7 +204,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     $scope.deleteServer = function(hostname){
         console.log("[*] Deleting " + hostname + " for user " + $scope.user)
 
-        SSH.deleteServer(hostname, $scope.user)
+        SERVER.deleteServer(hostname, $scope.user)
         .then(function(){
             $scope.getServers()
             console.log("[DEBUG] Remove " +hostname+" : success")
@@ -214,7 +214,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     $scope.accessPanel = function(hostname){
         console.log('[DEBUG] Accessing panel for ' + hostname)
 
-        $state.go('panel')
+        $state.go('panel/' + hostname)
 
     }
     $scope.user = AuthService.getUser()

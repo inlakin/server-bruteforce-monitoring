@@ -1,76 +1,85 @@
 <div class="margin-top"></div>
 
-<h2>{{server}}</h2>
-
 <div class="row">
-<div class="col-md-1"></div>
-<div class="col-md-4">
-    <form class="form">
-        <fieldset>
-            <div class="form-group">
-                <label class="control-label">Map</label>
-                <button ng-hide="options.map_active" class="btn btn-primary" ng-click="showMap()">Activate</button>
-                <button ng-show="options.map_active" class="btn btn-primary" ng-click="showMap()">Deactivate</button>
-            </div>
-            <div class="form-group">
-                <label class="control-label">Bruteforce attemps</label>
-                <button ng-hide="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()">Show</button>
-                <button ng-show="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()">Hide</button>
-            </div>
-        </fieldset>
-    </form>
-</div>
-<div class="col-md-7"></div>
-
-<!-- 
-    <button ng-click="fetchAttempt()" class="btn btn-primary">Fetch bruteforce attempt</button>
-    Map
-    <label for="" class="radio">
-        <input type="radio" name="activateMap" value="activate" id="activate">
-        On
-    </label>
-    <label>
-        <input type="radio" name="deactivateMap" value="deactivate" id="deactivate">
-        Off
-    </label> -->
-    
-</div>
-
-<ui-gmap-google-map ng-show="options.map_active" center='map.center' zoom='map.zoom'>                             
-   <ui-gmap-markers click="clickMarker" icon="'icon'" models="markers" coords="'coord'">
-   </ui-gmap-markers>
-</ui-gmap-google-map>
-    
-
-<div class="container" ng-show="options.bruteforce_attempts">
-    <div class="bs-example" data-example-id="panel-without-body-with-table">
-        <div class="panel panel-default">
-            <div class="panel-heading">Bruteforce attemps</div>
-            <table datatable="ng" class="table row-border hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>IP Address</th>
-                        <th>Country</th>
-                        <th>City</th>
-                        <th>Postal code</th>
-                        <th>Lat</th>
-                        <th>Long</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="p in bruteforce_list track by $index">
-                        <th scope="row">{{$index+1}}</th>
-                        <td>{{p.ip}}</td>
-                        <td>{{p.country}}</td>
-                        <td>{{p.city}}</td>
-                        <td>{{p.postal_code}}</td>
-                        <td>{{p.latitude}}</td>
-                        <td>{{p.longitude}}</td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
+    <div class="col-md-4"></div>
+    <div class="col-md-4 server-header">
+        <h4>Hostname : {{server}} / Status :
+            <span ng-show="isUp" class="server_up" ng-click=changeServerStatus()>Up</span>
+            <span ng-hide="isUp" class="server_down" ng-click=changeServerStatus()>Down</span>
+        </h4>
     </div>
+    <div class="col-md-4"></div>
 </div>
+
+<div class="row margin-top">
+    <div class="col-md-1">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Options</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Map</th>
+                    <th>
+                        <button ng-hide="options.map_active" class="btn btn-primary" ng-click="showMap()" ng-disabled="!isUp">Activate</button>
+                        <button ng-show="options.map_active" class="btn btn-primary" ng-click="showMap()">Deactivate</button>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Bruteforce attempts</th>
+                    <th>
+                        <button ng-hide="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()" ng-disabled="!isUp">Show</button>
+                        <button ng-show="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()">Hide</button>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-10">
+
+        <!-- MAP  -->
+        <ui-gmap-google-map ng-show="options.map_active" center='map.center' zoom='map.zoom'>                             
+            <ui-gmap-markers click="clickMarker" icon="'icon'" models="markers" coords="'coord'"></ui-gmap-markers>
+        </ui-gmap-google-map>
+        
+        <!-- Description -->
+        <div class="container" ng-show="options.bruteforce_attempts">
+            <div class="bs-example" data-example-id="panel-without-body-with-table">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Bruteforce attemps</div>
+                    <table datatable="ng" class="table row-border hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>IP Address</th>
+                                <th>Country</th>
+                                <th>City</th>
+                                <th>Postal code</th>
+                                <th>Lat</th>
+                                <th>Long</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="p in bruteforce_list track by $index">
+                                <th scope="row">{{$index+1}}</th>
+                                <td>{{p.ip}}</td>
+                                <td>{{p.country}}</td>
+                                <td>{{p.city}}</td>
+                                <td>{{p.postal_code}}</td>
+                                <td>{{p.latitude}}</td>
+                                <td>{{p.longitude}}</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+    <div class="col-md-1"></div>
+</div>
+

@@ -28,7 +28,7 @@ angular.module('myApp')
         .then(function(){
             console.log("[DEBUG] Server Found")
             verified = true;
-            
+
             SERVER.isConnected($scope.server, $scope.user)
             .then(function(){
                 $scope.isUp = true;
@@ -50,11 +50,16 @@ angular.module('myApp')
 
     $scope.verifyServer()
 
-    console.log('[DEBUG] $stateParams : \n' + JSON.stringify($stateParams, null, 2))
-    console.log("[DEBUG] Options: ")
-    console.log("\tBruteforce attempts : " + $scope.options.bruteforce_attempts)
-    console.log("\tMap Active          : " + $scope.options.map_active)
+    $scope.changeServerStatus = function(){
+        if ($scope.isUp){
+            // handle disconnection
+            $scope.isUp = false;
 
+        } else {
+            // Handle connection
+            $scope.isUp = true;
+        }
+    }
     $scope.showMap = function(){
         $scope.options.map_active = ($scope.options.map_active) ? false : true;
     }

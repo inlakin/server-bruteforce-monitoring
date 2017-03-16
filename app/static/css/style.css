@@ -112,12 +112,21 @@ body{
 *                          *
  ***************************/
 
+.panel-options{
+    padding-left: 2em;
+    font-family: "Courier New";
+}
+
 .server-header{
     text-align: center;
     font-family: 'Courier New';
 }
 
-.server_up{
+.bruteforce-attempts{
+    font-family: "Courier New";
+}
+
+.server-up{
     border: 1px solid #4CAE4C;
     background-color: #5CB85C;
     border-radius:0.5em;
@@ -126,7 +135,7 @@ body{
     cursor:pointer;
 }
 
-.server_down{
+.server-down{
     border: 1px solid black;
     background-color: red;
     border-radius:0.5em;

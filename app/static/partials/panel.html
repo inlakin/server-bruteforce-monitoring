@@ -4,15 +4,15 @@
     <div class="col-md-4"></div>
     <div class="col-md-4 server-header">
         <h4>Hostname : {{server}} / Status :
-            <span ng-show="isUp" class="server_up" ng-click=changeServerStatus()>Up</span>
-            <span ng-hide="isUp" class="server_down" ng-click=changeServerStatus()>Down</span>
+            <span ng-show="isUp" class="server-up" ng-click=changeServerStatus()>Up</span>
+            <span ng-hide="isUp" class="server-down" ng-click=changeServerStatus()>Down</span>
         </h4>
     </div>
     <div class="col-md-4"></div>
 </div>
-
+<hr>
 <div class="row margin-top">
-    <div class="col-md-1">
+    <div class="col-md-2 panel-options">
         <table class="table">
             <thead>
                 <tr>
@@ -38,7 +38,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-9">
 
         <!-- MAP  -->
         <ui-gmap-google-map ng-show="options.map_active" center='map.center' zoom='map.zoom'>                             
@@ -46,7 +46,7 @@
         </ui-gmap-google-map>
         
         <!-- Description -->
-        <div class="container" ng-show="options.bruteforce_attempts">
+        <div class="container bruteforce-attempts" ng-show="options.bruteforce_attempts">
             <div class="bs-example" data-example-id="panel-without-body-with-table">
                 <div class="panel panel-default">
                     <div class="panel-heading">Bruteforce attemps</div>
@@ -80,6 +80,5 @@
         </div>
     </div>    
 
-    <div class="col-md-1"></div>
 </div>
 

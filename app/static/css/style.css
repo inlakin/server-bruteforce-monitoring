@@ -143,3 +143,16 @@ body{
     padding:0.5em;
     cursor: pointer;
 }
+
+.panel-stats{
+
+}
+
+.panel-stats-header{
+    text-align: center;
+}
+
+.row{
+    padding: 0;
+    margin:0;
+}

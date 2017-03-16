@@ -20,8 +20,80 @@ angular.module('myApp')
 
     $scope.options = {
             "bruteforce_attempts": false,
-            "map_active":false
+            "map_active":false,
+            "bruteforce_stats":false
     }
+
+    $scope.countries = [
+        {
+            'name':"France",
+            'attempts': 21
+        },
+        {
+            'name':"China",
+            'attempts': 107
+        },
+        {
+            'name':"Russia",
+            'attempts': 43
+        },
+        {
+            'name':"United States of America",
+            'attempts': 2
+        }
+    ]
+    $scope.cities = [
+        {
+            'name': 'Budapest',
+            'attempts':98
+        },
+        {
+            'name': 'Paris',
+            'attempts':8
+        },
+        {
+            'name': 'Hong-Kong',
+            'attempts':43
+        },
+        {
+            'name': 'New-York',
+            'attempts':49
+        },
+        {
+            'name': 'Shangai',
+            'attempts':29
+        }
+    ]
+    $scope.days = [
+        {
+            'name':'Monday',
+            'attempts': 3
+        },
+        {
+            'name':'Tuesday',
+            'attempts': 6
+        },
+        {
+            'name':'Wednesday',
+            'attempts': 2
+        },
+        {
+            'name':'Thursday',
+            'attempts': 1
+        },
+        {
+            'name':'Friday',
+            'attempts': 9
+        },
+        {
+            'name':'Saturday',
+            'attempts': 29
+        },
+        {
+            'name':'Sunday',
+            'attempts': 54
+        }
+    ]
 
     $scope.verifyServer = function(){
         SERVER.verify($scope.server, $scope.user)
@@ -87,6 +159,10 @@ angular.module('myApp')
             $scope.bruteforce_list = []
             $scope.bruteforce_list = ProfilesService.getBruteforceList();
         }
+    }
+
+    $scope.showStats = function(){
+        $scope.options.bruteforce_stats = ($scope.options.bruteforce_stats) ? false:true; 
     }
 //   get_profiles = ProfilesService.getProfiles();
 //   $scope.profiles = get_profiles

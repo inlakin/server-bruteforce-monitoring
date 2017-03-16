@@ -35,6 +35,13 @@
                         <button ng-show="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()">Hide</button>
                     </th>
                 </tr>
+                <tr>
+                    <th>Bruteforce stats</th>
+                    <th>
+                        <button ng-hide="options.bruteforce_stats" class="btn btn-primary" ng-click="showStats()" ng-disabled="!isUp">Show</button>
+                        <button ng-show="options.bruteforce_stats" class="btn btn-primary" ng-click="showStats()">Hide</button>
+                    </th>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -79,6 +86,80 @@
             </div>
         </div>
     </div>    
-
 </div>
 
+
+<div ng-show=options.bruteforce_stats>
+    <hr>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="panel-stats-header">Bruteforce Statistics</h3>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Bruteforce attempts by countries</div>
+                <table datatable='ng' class="table row-border hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Country name</th>
+                            <th>Number of attempts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="c in countries | orderBy:'attempts' track by $index ">
+                            <th scope="row">{{$index+1}}</th>
+                            <th>{{c.name}}</th>
+                            <th>{{c.attempts}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Bruteforce attempts by cities</div>
+                <table datatable="ng" class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>City name</th>
+                            <th>Number of attempts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="ci in cities | orderBy:'attempts' track by $index">
+                            <th scope="row">{{$index+1}}</th>
+                            <th>{{ci.name}}</th>
+                            <th>{{ci.attempts}}</th>
+                        </tr>
+                    </tbody>
+                </table>    
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Bruteforce attempts by days</div>
+                <table datatable="ng" class="table">
+                    <thead>
+                        <tr>
+                            <th>Day of the week</th>
+                            <th>Number of attempts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="d in days">
+                            <th>{{d.name}}</th>
+                            <th>{{d.attempts}}</th>
+                        </tr>
+                    </tbody>
+                </table>    
+            </div>
+            
+        </div>    
+    </div>
+</div>

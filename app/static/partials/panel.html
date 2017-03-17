@@ -3,7 +3,7 @@
 <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4 server-header">
-        <h4>Hostname : {{server}} / Status :
+        <h4>Hostname : <span class="server-header-hostname">{{server}}</span> / Status :
             <span ng-show="isUp" class="server-up" ng-click=changeServerStatus()>Up</span>
             <span ng-hide="isUp" class="server-down" ng-click=changeServerStatus()>Down</span>
         </h4>

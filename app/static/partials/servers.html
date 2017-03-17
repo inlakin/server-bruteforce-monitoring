@@ -49,12 +49,17 @@
                 </tr>
             </thead>
             <tbody>
-                    <tr ng-repeat="s in servers track by $index">
+                    <tr ng-repeat="s in servers track by $index" >
                         <th scope="row">{{$index+1}}</th>
-                        <td> {{s.name}} </td>
-                        <td> {{s.hostname}} </td>
-                        <td> {{s.username}} </td>
-                        <td> {{s.port}} </td>
+                        <td ng-hide="s.connected"> {{s.name}} </td>
+                        <td ng-show="s.connected" class="alert alert-success"> {{s.name}} </td>
+                        <td ng-hide="s.connected"> {{s.hostname}} </td>
+                        <td ng-show="s.connected" class="alert alert-success"> {{s.hostname}} </td>
+                        <td ng-hide="s.connected"> {{s.username}} </td>
+                        <td ng-show="s.connected" class="alert alert-success"> {{s.username}} </td>
+                        <td ng-hide="s.connected"> {{s.port}} </td>
+                        <td ng-show="s.connected" class="alert alert-success"> {{s.port}} </td>
+                        
                         <td> 
                             <span ng-hide="s.connected" ng-click="connect(s.username, s.hostname, s.port)" class="glyphicon glyphicon-play icon icon-connect"> Connect</span>
                             <span ng-show="s.connected" ng-click="disconnect(s.hostname)" class="glyphicon glyphicon-stop icon icon-disconnect"> Disconnect</span>
@@ -66,8 +71,8 @@
                             <span ng-click="deleteServer(s.hostname)" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
                          </td>
                         <td>
-                            <span ng-show="s.connected" ng-click="accessPanel(s.hostname)" class="glyphicon glyphicon-globe icon icon-globe">Access panel</span> 
-                         </td>
+                            <span ng-click="accessPanel(s.hostname)" class="glyphicon glyphicon-plus icon icon-globe"> Access panel</span> 
+                         </td>    
                     </tr>
             </tbody>
         </table>

@@ -3,3 +3,4 @@ app/*.pyc
 *.pyc
 *.txt
 .gitold/
+.git-*/

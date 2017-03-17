@@ -14,7 +14,7 @@
 *
 * Description
 */
-angular.module('myApp.UserProfil', ['angular-terminal'])
+angular.module('myApp.Servers', ['angular-terminal'])
 
 .run(function ($rootScope) {
 
@@ -43,7 +43,7 @@ angular.module('myApp.UserProfil', ['angular-terminal'])
     });
 })
 
-.controller('ProfilCtrl', [
+.controller('ServersCtrl', [
     '$scope',
     '$state',
     '$http',

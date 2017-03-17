@@ -14,7 +14,7 @@ angular.module('myApp')
     $scope.user            = AuthService.getUser()
     $scope.bruteforce_list = []
     $scope.isUp            = false;
-    
+    $scope.getinfo         = false;
     var verified           = false;
     var isFetched          = false;
 
@@ -38,8 +38,32 @@ angular.module('myApp')
             'attempts': 43
         },
         {
-            'name':"United States of America",
+            'name':"USA",
             'attempts': 2
+        },
+        {
+            'name':"Taiwan",
+            'attempts': 20
+        },
+        {
+            'name':"Viet Nam",
+            'attempts': 36
+        },
+        {
+            'name':"Ukraine",
+            'attempts': 1
+        },
+        {
+            'name':"Laos",
+            'attempts': 93
+        },
+        {
+            'name':"Brasil",
+            'attempts': 23
+        },
+        {
+            'name':"Canada",
+            'attempts': 56
         }
     ]
     $scope.cities = [
@@ -62,35 +86,67 @@ angular.module('myApp')
         {
             'name': 'Shangai',
             'attempts':29
+        },
+        {
+            'name': 'Zaghreb',
+            'attempts':29
+        },
+        {
+            'name': 'Moscou',
+            'attempts':29
+        },
+        {
+            'name': 'Lima',
+            'attempts':29
+        },
+        {
+            'name': 'Abu Dhabi',
+            'attempts':29
+        },
+        {
+            'name': 'Marseille',
+            'attempts':29
         }
     ]
-    $scope.days = [
+    $scope.usernames = [
         {
-            'name':'Monday',
+            'name':'root',
             'attempts': 3
         },
         {
-            'name':'Tuesday',
+            'name':'mother',
             'attempts': 6
         },
         {
-            'name':'Wednesday',
+            'name':'ftp',
             'attempts': 2
         },
         {
-            'name':'Thursday',
+            'name':'mongo',
             'attempts': 1
         },
         {
-            'name':'Friday',
+            'name':'john',
             'attempts': 9
         },
         {
-            'name':'Saturday',
+            'name':'lol',
             'attempts': 29
         },
         {
-            'name':'Sunday',
+            'name':'rosie',
+            'attempts': 54
+        },
+        {
+            'name':'mickael',
+            'attempts': 54
+        },
+        {
+            'name':'goa',
+            'attempts': 54
+        },
+        {
+            'name':'hello',
             'attempts': 54
         }
     ]
@@ -98,7 +154,6 @@ angular.module('myApp')
     $scope.verifyServer = function(){
         SERVER.verify($scope.server, $scope.user)
         .then(function(){
-            console.log("[DEBUG] Server Found")
             verified = true;
 
             SERVER.isConnected($scope.server, $scope.user)
@@ -110,7 +165,6 @@ angular.module('myApp')
             })
         })
         .catch(function(){
-            console.log("[DEBUG] 404 Server Not Found")
             verified = false;
         })
         .finally(function(){
@@ -132,6 +186,12 @@ angular.module('myApp')
             $scope.isUp = true;
         }
     }
+
+    $scope.getInfo = function(host){
+       console.log("[DEBUG] Getting more info about " + host)
+       $scope.getinfo = ($scope.getinfo) ? false : true;
+    }
+
     $scope.showMap = function(){
         $scope.options.map_active = ($scope.options.map_active) ? false : true;
     }

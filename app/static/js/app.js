@@ -13,7 +13,7 @@ angular.module('myApp', [
     'myApp.ServerService',
     'myApp.Authentication',
     'myApp.SSHCmdService',
-    'myApp.UserProfil',
+    'myApp.Servers',
     'angular-terminal'
 ])
 
@@ -59,11 +59,10 @@ angular.module('myApp', [
             templateUrl:'/static/partials/register.html',
             controller:'AuthCtrl'
         })
-        .state('profil', {
-            url:'/profil',
-            templateUrl: '/static/partials/profil.html',
-            controller:'ProfilCtrl',
-            // data : {requiresLogin : true }
+        .state('servers', {
+            url:'/servers',
+            templateUrl: '/static/partials/servers.html',
+            controller:'ServersCtrl',
             authenticate: true
         })
         .state('panel', {

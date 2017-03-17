@@ -16,27 +16,27 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Options</th>
+                    <th>OPTIONS</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <th>Map</th>
+                    <td>Map</td>
                     <th>
-                        <button ng-hide="options.map_active" class="btn btn-primary" ng-click="showMap()" ng-disabled="!isUp">Activate</button>
-                        <button ng-show="options.map_active" class="btn btn-primary" ng-click="showMap()">Deactivate</button>
+                        <button ng-hide="options.map_active" class="btn btn-primary" ng-click="showMap()" ng-disabled="!isUp">Show</button>
+                        <button ng-show="options.map_active" class="btn btn-primary" ng-click="showMap()">Hide</button>
                     </th>
                 </tr>
                 <tr>
-                    <th>Bruteforce attempts</th>
+                    <td>Bruteforce attempts</td>
                     <th>
                         <button ng-hide="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()" ng-disabled="!isUp">Show</button>
                         <button ng-show="options.bruteforce_attempts" class="btn btn-primary" ng-click="fetchBruteforceList()">Hide</button>
                     </th>
                 </tr>
                 <tr>
-                    <th>Bruteforce stats</th>
+                    <td>Bruteforce stats</td>
                     <th>
                         <button ng-hide="options.bruteforce_stats" class="btn btn-primary" ng-click="showStats()" ng-disabled="!isUp">Show</button>
                         <button ng-show="options.bruteforce_stats" class="btn btn-primary" ng-click="showStats()">Hide</button>
@@ -54,9 +54,11 @@
         
         <!-- Description -->
         <div class="container bruteforce-attempts" ng-show="options.bruteforce_attempts">
+            <hr> 
+
             <div class="bs-example" data-example-id="panel-without-body-with-table">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Bruteforce attemps</div>
+                    <div class="panel-heading">Bruteforce attempts</div>
                     <table datatable="ng" class="table row-border hover">
                         <thead>
                             <tr>
@@ -64,102 +66,108 @@
                                 <th>IP Address</th>
                                 <th>Country</th>
                                 <th>City</th>
-                                <th>Postal code</th>
-                                <th>Lat</th>
-                                <th>Long</th>
+                                <th>Username used</th>
+                                <th>Timestamp</th>
+                                <th>View info</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="p in bruteforce_list track by $index">
-                                <th scope="row">{{$index+1}}</th>
+                                <th>{{$index+1}}</th>
                                 <td>{{p.ip}}</td>
                                 <td>{{p.country}}</td>
                                 <td>{{p.city}}</td>
-                                <td>{{p.postal_code}}</td>
-                                <td>{{p.latitude}}</td>
-                                <td>{{p.longitude}}</td>
+                                <td>{{p.username}}</td>
+                                <td>{{p.timestamp}}</td>
+                                <td>
+                                    <span class="glyphicon glyphicon-plus icon" ng-click="getInfo(p.ip)"></span>
+                                </td>
+                                <p ng-show="getinfo" class="alert alert-success">
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias possimus earum modi eum. Quo culpa, deleniti consequuntur laudantium incidunt, laboriosam, ipsa veritatis dolores nesciunt dolore consectetur distinctio voluptate quas temporibus.
+                                </p>
                             </tr>
-
+                            
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <div ng-show=options.bruteforce_stats class="panel-stats">
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="panel-stats-header">Bruteforce Statistics</h3>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Bruteforce attempts by countries</div>
+                        <table datatable='ng' class="table row-border hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Country name</th>
+                                    <th>attempts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="c in countries | orderBy:'attempts' track by $index ">
+                                    <th scope="row">{{$index+1}}</th>
+                                    <td>{{c.name}}</td>
+                                    <td>{{c.attempts}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Bruteforce attempts by cities</div>
+                        <table datatable="ng" class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>City name</th>
+                                    <th>attempts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ci in cities | orderBy:'attempts' track by $index">
+                                    <th scope="row">{{$index+1}}</th>
+                                    <td>{{ci.name}}</td>
+                                    <td>{{ci.attempts}}</td>
+                                </tr>
+                            </tbody>
+                        </table>    
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Bruteforce attempts by username</div>
+                        <table datatable="ng" class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Username used</th>
+                                    <th>attempts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="u in usernames | orderBy:'attempts' | filter:number track by $index ">
+                                    <th scope="row">{{$index+1}}</th>
+                                    <td>{{u.name}}</td>
+                                    <td>{{u.attempts}}</td>
+                                </tr>
+                            </tbody>
+                        </table>    
+                    </div>
+                </div>    
             </div>
         </div>
     </div>    
 </div>
 
 
-<div ng-show=options.bruteforce_stats>
-    <hr>
-    
-    <div class="row">
-        <div class="col-md-12">
-            <h3 class="panel-stats-header">Bruteforce Statistics</h3>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">Bruteforce attempts by countries</div>
-                <table datatable='ng' class="table row-border hover">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Country name</th>
-                            <th>Number of attempts</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="c in countries | orderBy:'attempts' track by $index ">
-                            <th scope="row">{{$index+1}}</th>
-                            <th>{{c.name}}</th>
-                            <th>{{c.attempts}}</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">Bruteforce attempts by cities</div>
-                <table datatable="ng" class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>City name</th>
-                            <th>Number of attempts</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="ci in cities | orderBy:'attempts' track by $index">
-                            <th scope="row">{{$index+1}}</th>
-                            <th>{{ci.name}}</th>
-                            <th>{{ci.attempts}}</th>
-                        </tr>
-                    </tbody>
-                </table>    
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">Bruteforce attempts by days</div>
-                <table datatable="ng" class="table">
-                    <thead>
-                        <tr>
-                            <th>Day of the week</th>
-                            <th>Number of attempts</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="d in days">
-                            <th>{{d.name}}</th>
-                            <th>{{d.attempts}}</th>
-                        </tr>
-                    </tbody>
-                </table>    
-            </div>
-            
-        </div>    
-    </div>
-</div>

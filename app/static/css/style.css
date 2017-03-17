@@ -108,6 +108,19 @@ body{
 
 /***************************
 *                          *
+*       STYLE : SERVERS    *
+*                          *
+ ***************************/
+
+.courier{
+    font-family: "Courier New";
+}
+.profil-server-table{
+    font-family: "Courier New";
+}
+
+/***************************
+*                          *
 *       STYLE : PANEL      *
 *                          *
  ***************************/
@@ -136,8 +149,8 @@ body{
 }
 
 .server-down{
-    border: 1px solid black;
-    background-color: red;
+    border: 1px solid #7C1111;
+    background-color: #BF3030;
     border-radius:0.5em;
     color: white;
     padding:0.5em;
@@ -145,7 +158,7 @@ body{
 }
 
 .panel-stats{
-
+    font-family: 'Courier New';
 }
 
 .panel-stats-header{

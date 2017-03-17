@@ -14,7 +14,7 @@ angular.module('myApp.Authentication', [])
 
         AuthService.login($scope.loginForm.email, $scope.loginForm.password)
         .then(function(data){
-            $state.go('profil');
+            $state.go('servers');
             $scope.disabled  = false;
             $scope.loginForm = {}
         })

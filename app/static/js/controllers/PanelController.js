@@ -8,7 +8,8 @@ angular.module('myApp')
     '$stateParams',
     'SERVER',
     '$state',
-    function($scope, $http, ProfilesService, AuthService, $stateParams, SERVER, $state){
+    'orderByFilter',
+    function($scope, $http, ProfilesService, AuthService, $stateParams, SERVER, $state, orderBy){
     
     $scope.server          = $stateParams.hostname
     $scope.user            = AuthService.getUser()
@@ -24,7 +25,7 @@ angular.module('myApp')
             "bruteforce_stats":false
     }
 
-    $scope.countries = [
+    countries = [
         {
             'name':"France",
             'attempts': 21
@@ -66,7 +67,7 @@ angular.module('myApp')
             'attempts': 56
         }
     ]
-    $scope.cities = [
+    cities = [
         {
             'name': 'Budapest',
             'attempts':98
@@ -108,7 +109,7 @@ angular.module('myApp')
             'attempts':29
         }
     ]
-    $scope.usernames = [
+    usernames = [
         {
             'name':'root',
             'attempts': 3
@@ -150,6 +151,11 @@ angular.module('myApp')
             'attempts': 54
         }
     ]
+    console.log(countries.attempts)
+    property = 'attempts';
+    $scope.countries = orderBy(countries, property, true)
+    $scope.cities    = orderBy(cities, property, true)
+    $scope.usernames = orderBy(usernames, property, true)
 
     $scope.verifyServer = function(){
         SERVER.verify($scope.server, $scope.user)

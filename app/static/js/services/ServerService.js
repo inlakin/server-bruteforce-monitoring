@@ -19,7 +19,7 @@ angular.module('myApp.ServerService', [])
         isConnected: isConnected
     };
 
-    function addServer(name, hostname, username, port, email){
+    function addServer(name, hostname, username, port, email, password){
         var deferred = $q.defer();
 
         $http.post('/addserver', {
@@ -27,7 +27,8 @@ angular.module('myApp.ServerService', [])
             hostname: hostname,
             username: username,
             port: port,
-            email: email
+            email: email,
+            password:password
         })
         .success(function(data, status){
             if (status == 200 && data.result){
@@ -49,7 +50,14 @@ angular.module('myApp.ServerService', [])
         $http.post('/getservers', {email:email})
         .success(function(data, status){
             if(status == 200 && data[0].result){
-                deferred.resolve(data)
+                if (data[1] == null){
+                    console.log("[DEBUG] No results")
+                    deferred.reject("No results")
+                } else {
+                    console.log(JSON.stringify(data, null, 2))
+                    deferred.resolve(data)
+                }
+
             } else {
                 deferred.reject()
                 console.log(JSON.stringify(data, null, 2))
@@ -106,15 +114,16 @@ angular.module('myApp.ServerService', [])
         return deferred.promise;
     }
 
-    function connect(hostname, username, port, email){
-        console.log("[DEBUG] Processing " + hostname + " " + username)
+    function connect(hostname, username, port, email, password){
+        console.log("[DEBUG] Processing " + hostname + " " + username + " " + password)
         var deferred = $q.defer();
 
         c = {
             'hostname':hostname, 
             'username':username, 
             'port':port,
-            'email': email
+            'email': email,
+            'password':password
         }
 
         $http.post('/connect', c)
@@ -124,7 +133,7 @@ angular.module('myApp.ServerService', [])
                 clients.push(c);
                 deferred.resolve()    
             } else {
-                deferred.reject();
+                deferred.reject(data.message);
             }
         })
         .error(function(){

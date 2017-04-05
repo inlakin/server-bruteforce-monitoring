@@ -139,7 +139,13 @@ body{
 *       STYLE : SERVERS    *
 *                          *
  ***************************/
+.center{
+    text-align: center;
+}
 
+.noServers{
+    font-size: 2rem;
+}
 .courier{
     font-family: "Courier New";
 }
@@ -149,6 +155,10 @@ body{
 
 .connected{
     background-color:#87E09C;
+}
+
+.table > tbody > tr > td, .table > tbody > tr{
+    vertical-align: middle;
 }
 /***************************
 *                          *

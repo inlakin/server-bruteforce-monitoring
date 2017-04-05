@@ -11,7 +11,7 @@
 <hr>
 
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-1">
         
         <!-- <table class="table">
             <thead>
@@ -30,7 +30,15 @@
 
 
     </div>
-    <div class="col-md-8 profil-server-table">
+    <div class="col-md-10 courier center" ng-show="noServers">
+        <p>
+            Looks like you don't have any server yet.
+            Why dont you add one ? <br><br>
+
+            <button data-toggle="modal" href="#addServer" class="btn btn-primary">Add server</button>
+        </p>
+    </div>
+    <div class="col-md-10 profil-server-table" ng-hide="noServers">
         <table class="table">
             <thead>
                 <tr>
@@ -39,11 +47,11 @@
                     <th>Hostname</th>
                     <th>Username</th>
                     <th>Port</th>
-                    <th></th>
+                    <th>Password</th>
                     <th></th>
                     <th></th>
                     <th>
-                        <button class="btn btn-success" ng-click="refreshServer()"><span class="glyphicon glyphicon-refresh"></span></button>
+                        <button class="btn btn-success" ng-click="getServers()"><span class="glyphicon glyphicon-refresh"></span></button>
                         <button data-toggle="modal" href="#addServer" class="btn btn-primary">Add server</button>
                     </th>
                 </tr>
@@ -51,18 +59,24 @@
             <tbody>
                     <tr ng-repeat="s in servers track by $index" >
                         <th scope="row">{{$index+1}}</th>
-                        <td ng-hide="s.connected"> {{s.name}} </td>
-                        <td ng-show="s.connected" class="alert alert-success"> {{s.name}} </td>
-                        <td ng-hide="s.connected"> {{s.hostname}} </td>
-                        <td ng-show="s.connected" class="alert alert-success"> {{s.hostname}} </td>
-                        <td ng-hide="s.connected"> {{s.username}} </td>
-                        <td ng-show="s.connected" class="alert alert-success"> {{s.username}} </td>
-                        <td ng-hide="s.connected"> {{s.port}} </td>
-                        <td ng-show="s.connected" class="alert alert-success"> {{s.port}} </td>
+                        <td> {{s.name}} </td>
+                        <td> {{s.hostname}} </td>
+                        <td> {{s.username}} </td>
+                        <td> {{s.port}} </td>
+                        <td>
+                            <div class="input-group">
+                                <input ng-hide="s.connected" class="form-control" type="password" name="server-password" ng-model="form.server_password">
+                                <span class="input-group-btn">
+                                    <button ng-hide="s.connected" class="btn btn-success glyphicon glyphicon-play" ng-click="connect(s.username, s.hostname, s.port)"> Connect</button>
+                                </span>
+                                <span ng-show="s.connected" ng-click="disconnect(s.hostname)" class="glyphicon glyphicon-stop icon icon-disconnect"> Disconnect</span>    
+                            </div>
+                            <span class="alert alert-danger" ng-show="connectionFailed">{{connection_error}}</span>
+
+                        </td>
                         
                         <td> 
-                            <span ng-hide="s.connected" ng-click="connect(s.username, s.hostname, s.port)" class="glyphicon glyphicon-play icon icon-connect"> Connect</span>
-                            <span ng-show="s.connected" ng-click="disconnect(s.hostname)" class="glyphicon glyphicon-stop icon icon-disconnect"> Disconnect</span>
+                           
                         </td>
                         <td> 
                             <span ng-click="edit()" class="glyphicon glyphicon-edit icon icon-edit"> Edit</span>
@@ -71,13 +85,18 @@
                             <span ng-click="deleteServer(s.hostname)" class="glyphicon glyphicon-trash icon icon-trash"> Delete</span>
                          </td>
                         <td>
-                            <span ng-click="accessPanel(s.hostname)" class="glyphicon glyphicon-plus icon icon-globe"> Access panel</span> 
+                            <span ui-sref="panel({hostname: s.hostname})" class="glyphicon glyphicon-plus icon icon-globe"> Access panel</span> 
                          </td>    
                     </tr>
             </tbody>
         </table>
 
-        <div class="modal" id="addServer">
+        
+
+    </div>
+    <div class="col-md-1"></div>
+
+    <div class="modal" id="addServer">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -119,9 +138,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
-    <div class="col-md-2"></div>
 </div>
 <!-- 
 <div class="row">

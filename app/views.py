@@ -8,6 +8,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from pymongo import MongoClient
 from .user import User
 from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
 from bson import ObjectId
 
 import pymongo
@@ -133,7 +134,9 @@ def add_server():
     hostname = data['hostname']
     port     = data['port']
     email    = data['email']
-    
+    password = data['password']
+
+    pass_hash = generate_password_hash(password, method='pbkdf2:sha256')
     try:
         collection.insert({
             "hostname": hostname,
@@ -141,7 +144,8 @@ def add_server():
             "username" : username,
             "port" : port,
             "email": email,
-            "up": False
+            "up": False,
+            "password": pass_hash
             })   
         print "[*] Client added : " + hostname + " for " + email
         ret = {'result': True}
@@ -166,81 +170,121 @@ def getservers():
     clients = app.config['CLIENTS_COLLECTION'].find({'email': email})
 
     if clients is not None:
+        print clients
         ret = [{'result': True}]
         for c in clients:
             ret.append(c)
     else:
+        print "[DEBUG] No servers found"
         ret = [{'result': False}]
 
     return JSONEncoder().encode(ret)
 
+def add_to_server_connected(hostname, email, paramiko_ssh_client_obj):
+
+    global servers_connected
+    global nb_servers_connected
+
+    print "Adding " + hostname + " to servers connected list"
+    servers_connected.append({'hostname':hostname,'email':email,'ssh_obj':paramiko_ssh_client_obj})
+
+def remove_from_server_connected(hostname, email):
+
+    global servers_connected
+    global nb_servers_connected
+
+    print "Removing " + hostname + " from servers connected list"
+
+    servers_connected.pop("hostname")
 
 @app.route('/connect', methods=['POST'])
 @login_required
 def connect():
 
+    global servers_connected
+    # need to fetch the password in DB
+    
     data = json.loads(request.data.decode())
 
-    hostname = data['hostname']
-    email    = data['email']
-
     try:
-        ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
-        if ssh_client is not None:
-            
-            db_obj = ssh_client[0]
-            
-            # ATTEMPT CONNECTION HERE
-            # ssh = paramiko.SSHClient()
-            # ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            # hostname = db_obj['hostname']
-            # username = db_obj['username']
-            
-            try:
-                print "[*] Connecting to " + hostname + " ..." 
-                # ssh.connect(hostname, int(db_obj['port']), username=username, password=password)
-        
-                ret = {
-                    'result': True,
-                }
 
-                app.config['CLIENTS_COLLECTION'].update({'hostname':hostname, 'email':email}, {
-                    'username':db_obj['username'],
-                    'name':db_obj['name'],
-                    'hostname':db_obj['hostname'],
-                    'up':True,
-                    'email':db_obj['email'],
-                    '_id':db_obj['_id'],
-                    'port':db_obj['port']      
-                    })
+        hostname = data['hostname']
+        email    = data['email']
+        password = data['password']
+    
+        try:
 
-                ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
+            print "[DEBUG] Attempting to connect to " + hostname + " " + email + " " + password
+            ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
+            if ssh_client is not None:
                 
-                if ssh_client is not None:
-                    print "[DEBUG] " + ssh_client[0]['hostname'] + " up ? " + str(ssh_client[0]['up'])
+                db_obj = ssh_client[0]
+                
+                # ATTEMPT CONNECTION HERE
+                ssh = paramiko.SSHClient()
+
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                hostname = db_obj['hostname']
+                username = db_obj['username']
+                password_hash = db_obj['password']
+
+                print "[*] Connecting to " + hostname + " ..." 
+                
+                if check_password_hash(password_hash,password):
+                    try:
+                        ssh.connect(hostname, int(db_obj['port']), username=username, password=password)
+
+
+                        ret = {
+                            'result': True,
+                        }
+
+                        app.config['CLIENTS_COLLECTION'].update({'hostname':hostname, 'email':email}, {
+                            'username':db_obj['username'],
+                            'name':db_obj['name'],
+                            'hostname':db_obj['hostname'],
+                            'up':True,
+                            'email':db_obj['email'],
+                            '_id':db_obj['_id'],
+                            'port':db_obj['port']      
+                            })
+
+                        ssh_client = app.config['CLIENTS_COLLECTION'].find({'hostname':hostname, 'email':email})
                     
-                    if ssh_client[0]['up'] == True:
-                        ret = {'result':True}
-                        print "Connected to " + hostname
-                    else:
-                        print "Something went wrong while updating client status in DB"                    
-                        ret = {'result': False}
+                        if ssh_client is not None:
+                            print "[DEBUG] " + ssh_client[0]['hostname'] + " up ? " + str(ssh_client[0]['up'])
+                            
+                            if ssh_client[0]['up'] == True:
+                                ret = {'result':True}
+                                print "Connected to " + hostname
+                            else:
+                                print "Something went wrong while updating client status in DB"                    
+                                ret = {'result': False}
+                        else:
+                            print "Not found"
+                            ret = {'result':False}
+
+                    except paramiko.SSHException:
+                        print "[-] Connection failed"
+                        ret = {'result': False, 'message':'Connection failed.'}
                 else:
-                    print "Not found"
-                    ret = {'result':False}
+                    ret = {'result':False, 'message':"Wrong password."}
+                    print "[Debug] Password doesn't match"
+            else:
+                print "Host not found in DB"
+                ret = {'result': False, 'message':'Host not found'}
+        except Exception, e:
+            print str(e)
+            ret = {'result': False, 'message':'Connection failed.'}
 
-            except paramiko.SSHException:
-                print "[-] Connection failed"
-                ret = {'result': False}
-
-            
-        else:
-            print "Host not found in DB"
-            ret = {'result': False}
     except Exception, e:
         print str(e)
-        ret = {'result': False}
+        print "[DEBUG] Failed parsing arguments"
+        ret = {'result':False, 'message': 'Blank password'}
 
+
+
+    
 
     return json.dumps(ret)
 
@@ -386,7 +430,7 @@ def isConnected():
 @app.route('/exec_cmd', methods=['POST'])
 @login_required
 def exec_cmd():
-
+    global bruteforce_ip_list
     # data = json.loads(request.data.decode())
 
     # email    = data['email']
@@ -395,7 +439,7 @@ def exec_cmd():
 
 
     # print "CMD : ", cmd, " for ", email, " at ", hostname
-    # reader = geoip2.database.Reader('GeoLite2-City.mmdb')
+    reader = geoip2.database.Reader('app/res/GeoLite2-City.mmdb')
 
     file = open('./app/res/ip_auth_uniq.txt', "r")
     
@@ -406,35 +450,35 @@ def exec_cmd():
         r = {}
         nb_ip += 1
         if ip[0] == "0":
-            # try:
-                # response = reader.city(ip[1:].strip('\n'))
-                # r['ip']          = ip[1:].strip('\n')
-                # r['country']     = response.country.name
-                # r['city']        = response.city.name
-                # r['postal_code'] = response.postal.code
-                # r['latitude']    = response.location.latitude
-                # r['longitude']   = response.location.longitude
+            try:
+                response = reader.city(ip[1:].strip('\n'))
+                r['ip']          = ip[1:].strip('\n')
+                r['country']     = response.country.name
+                r['city']        = response.city.name
+                r['postal_code'] = response.postal.code
+                r['latitude']    = response.location.latitude
+                r['longitude']   = response.location.longitude
                 # bruteforce_ip_list.append(r)
-            # except Exception, e:
-            #   print str(e)
-            r['ip'] = ip[1:].strip('\n')
+            except Exception, e:
+              print str(e)
+            # r['ip'] = ip[1:].strip('\n')
         else:
-            # try:
-                # response = reader.city(ip.strip('\n'))
-                # r['ip']          = ip.strip('\n')
-                # r['country']     = response.country.name
-                # r['city']        = response.city.name
-                # r['postal_code'] = response.postal.code
-                # r['latitude']    = response.location.latitude
-                # r['longitude']   = response.location.longitude
-                # bruteforce_ip_list.append(r)
-            # except Exception, e:
-            #   print str(e)
-            r['ip'] = ip.strip('\n')
+            try:
+                response = reader.city(ip.strip('\n'))
+                r['ip']          = ip.strip('\n')
+                r['country']     = response.country.name
+                r['city']        = response.city.name
+                r['postal_code'] = response.postal.code
+                r['latitude']    = response.location.latitude
+                r['longitude']   = response.location.longitude
+            except Exception, e:
+              print str(e)
+            # r['ip'] = ip.strip('\n')
 
         bruteforce_ip_list.append(r)
 
     print "Found " + str(nb_ip) + " ip(s)"
+    print type(bruteforce_ip_list)
    
 
 
@@ -443,6 +487,22 @@ def exec_cmd():
 
     file.close()
     return json.dumps(ret)
+
+# @app.route('/process-bruteforce-attempts', methods=['POST'])
+# @login_required
+# def process():
+
+#     data = json.loads(request.data.decode())
+
+#     req = data['request']
+#     bl = bruteforce_ip_list
+
+#     if len(bl) is not None:
+#         print "[DEBUG] Fetched BL"
+#     if 'country' in req:
+
+        # Process attempts by countries filtering
+        # 
 
 # @app.route("/exec", methods=['POST'])
 # def exec(request):

@@ -19,10 +19,36 @@ angular.module('myApp')
     var verified           = false;
     var isFetched          = false;
 
+    $scope.myDataSource = {
+        chart: {
+            caption: "Harry's SuperMart",
+            subCaption: "Top 5 stores in last month by revenue",
+        },
+        data:[{
+            label: "Bakersfield Central",
+            value: "880000"
+        },
+        {
+            label: "Garden Groove harbour",
+            value: "730000"
+        },
+        {
+            label: "Los Angeles Topanga",
+            value: "590000"
+        },
+        {
+            label: "Compton-Rancho Dom",
+            value: "520000"
+        },
+        {
+            label: "Daly City Serramonte",
+            value: "330000"
+        }]
+      };
     $scope.options = {
-            "bruteforce_attempts": false,
-            "map_active":false,
-            "bruteforce_stats":false
+        "bruteforce_attempts": false,
+        "map_active":false,
+        "bruteforce_stats":false
     }
 
     countries = [
@@ -67,92 +93,93 @@ angular.module('myApp')
             'attempts': 56
         }
     ]
-    cities = [
+    cities    = [
         {
-            'name': 'Budapest',
-            'attempts':98
+        'name': 'Budapest',
+        'attempts':98
         },
         {
-            'name': 'Paris',
-            'attempts':8
+        'name': 'Paris',
+        'attempts':8
         },
         {
-            'name': 'Hong-Kong',
-            'attempts':43
+        'name': 'Hong-Kong',
+        'attempts':43
         },
         {
-            'name': 'New-York',
-            'attempts':49
+        'name': 'New-York',
+        'attempts':49
         },
         {
-            'name': 'Shangai',
-            'attempts':29
+        'name': 'Shangai',
+        'attempts':29
         },
         {
-            'name': 'Zaghreb',
-            'attempts':29
+        'name': 'Zaghreb',
+        'attempts':29
         },
         {
-            'name': 'Moscou',
-            'attempts':29
+        'name': 'Moscou',
+        'attempts':29
         },
         {
-            'name': 'Lima',
-            'attempts':29
+        'name': 'Lima',
+        'attempts':29
         },
         {
-            'name': 'Abu Dhabi',
-            'attempts':29
+        'name': 'Abu Dhabi',
+        'attempts':29
         },
         {
-            'name': 'Marseille',
-            'attempts':29
+        'name': 'Marseille',
+        'attempts':29
         }
     ]
     usernames = [
         {
-            'name':'root',
-            'attempts': 3
+        'name':'root',
+        'attempts': 3
         },
         {
-            'name':'mother',
-            'attempts': 6
+        'name':'mother',
+        'attempts': 6
         },
         {
-            'name':'ftp',
-            'attempts': 2
+        'name':'ftp',
+        'attempts': 2
         },
         {
-            'name':'mongo',
-            'attempts': 1
+        'name':'mongo',
+        'attempts': 1
         },
         {
-            'name':'john',
-            'attempts': 9
+        'name':'john',
+        'attempts': 9
         },
         {
-            'name':'lol',
-            'attempts': 29
+        'name':'lol',
+        'attempts': 29
         },
         {
-            'name':'rosie',
-            'attempts': 54
+        'name':'rosie',
+        'attempts': 54
         },
         {
-            'name':'mickael',
-            'attempts': 54
+        'name':'mickael',
+        'attempts': 54
         },
         {
-            'name':'goa',
-            'attempts': 54
+        'name':'goa',
+        'attempts': 54
         },
         {
-            'name':'hello',
-            'attempts': 54
+        'name':'hello',
+        'attempts': 54
         }
     ]
-    console.log(countries.attempts)
+
     property = 'attempts';
+
     $scope.countries = orderBy(countries, property, true)
     $scope.cities    = orderBy(cities, property, true)
     $scope.usernames = orderBy(usernames, property, true)
@@ -228,11 +255,21 @@ angular.module('myApp')
     }
 
     $scope.showStats = function(){
+
+
+        // Process stats for attempts by countries
+        if (ProfilesService.setAttemptsByCountries()){
+            console.log("[*] [DEBUG] Attempts by Countries available")
+        } else {
+            console.log("[!] [DEBUG] Attempts by Countries unavailable")
+        }
+        // for 
+
+        // Process stats for attempts by cities
+        // process stats for attempts by username
+
         $scope.options.bruteforce_stats = ($scope.options.bruteforce_stats) ? false:true; 
     }
-//   get_profiles = ProfilesService.getProfiles();
-//   $scope.profiles = get_profiles
-
 
 //   $scope.markers = []
 

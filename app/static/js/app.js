@@ -14,7 +14,8 @@ angular.module('myApp', [
     'myApp.Authentication',
     'myApp.SSHCmdService',
     'myApp.Servers',
-    'angular-terminal'
+    'angular-terminal',
+    "ng-fusioncharts"
 ])
 
 .config(function(uiGmapGoogleMapApiProvider) {
@@ -67,6 +68,12 @@ angular.module('myApp', [
         })
         .state('panel', {
             url:'/panel/:hostname',
+            params: {
+                hostname:{
+                    value:'default',
+                    squash:false
+                }
+            },
             templateUrl:'/static/partials/panel.html',
             controller:'PanelCtrl',
             authenticate: true

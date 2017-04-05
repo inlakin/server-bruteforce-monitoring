@@ -51,19 +51,26 @@ angular.module('myApp.Servers', ['angular-terminal'])
     'AuthService',
     function($scope, $state, $http, SERVER, AuthService){
     
-    $scope.user      = "";
-    errorMessage     = "";
-    successMessage   = "";
-    $scope.connected = true;
-    $scope.servers   = [];
-    $scope.serversUp = [];
-
+    $scope.user             = "";
+    errorMessage            = "";
+    successMessage          = "";
+    $scope.connected        = true;
+    $scope.noServers        = true;
+    $scope.connectionFailed = false;
+    $scope.connection_error = "";
+    $scope.servers          = [];
+    $scope.serversUp        = [];
+    $scope.form             = {};
 
     $scope.getServers = function(){
 
         SERVER.getServers($scope.user)
         .then(function(data){
-            
+            $scope.noServers = false;
+            console.log(JSON.stringify(data, null, 2))
+            console.log("data[0] "+JSON.stringify(data[0], null, 2))
+            console.log("data[1] "+JSON.stringify(data[0], null, 2))
+            console.log("data[2] "+JSON.stringify(data[0], null, 2))
             $scope.servers   = [];
             $scope.serversUp = [];
 
@@ -84,8 +91,14 @@ angular.module('myApp.Servers', ['angular-terminal'])
                 $scope.servers.push(s)
             }
         })
-        .catch(function(){
-            console.log("[-] Failed to fetch servers")
+        .catch(function(data){
+            if (data != null){
+                console.log(data)
+                $scope.noServers = true;
+            }else{
+                console.log("[-] Failed to fetch servers")
+
+            }
         })
     }
     
@@ -93,7 +106,7 @@ angular.module('myApp.Servers', ['angular-terminal'])
 
         // Need to check first connection before adding 
         // 
-       SERVER.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user)
+       SERVER.addServer($scope.serverForm.name, $scope.serverForm.hostname, $scope.serverForm.username, $scope.serverForm.port, $scope.user, $scope.serverForm.password)
         .then(function(){
             $scope.success        = true;
             $scope.successMessage = "Server added"
@@ -101,7 +114,7 @@ angular.module('myApp.Servers', ['angular-terminal'])
             $scope.disabled       = false
 
             console.log("[*] Server added");
-            
+            $scope.noServers = false;
             $scope.getServers()
         })
         .catch(function(){
@@ -139,20 +152,25 @@ angular.module('myApp.Servers', ['angular-terminal'])
             }
         }
     }
-
+    
     $scope.connect = function(username, hostname, port){
-        connect = false;
-        email   = $scope.user;
-
+        connect                 = false;
+        email                   = $scope.user;
+        $scope.connectionFailed = false;        
+        
+        console.log(username + " " + hostname + " " + port + " " + $scope.form.server_password)
+        $scope.connectionFailed = false;
         if ($scope.serversUp.length == 0){
 
-            SERVER.connect(hostname, username, port, email)
+            SERVER.connect(hostname, username, port, email, $scope.form.server_password)
             .then(function(){
                 console.log("[DEBUG] Connected")
                 $scope.serverUp(hostname)
             })
-            .catch(function(){
-                console.log("[DEBUG] Not connected")
+            .catch(function(data){
+                console.log("[DEBUG] Not connected " + data)
+                $scope.connectionFailed = true;
+                $scope.connection_error = data;
             });
         } else {
 
@@ -211,12 +229,13 @@ angular.module('myApp.Servers', ['angular-terminal'])
         })
     }
 
-    $scope.accessPanel = function(hostname){
-        console.log('[DEBUG] Accessing panel for ' + hostname)
+    // $scope.accessPanel = function(hostname){
+    //     console.log('[DEBUG] Accessing panel for ' + hostname)
 
-        $state.go('panel/' + hostname)
+    //     $state.go('panel/' + hostname)
 
-    }
+    // }
+    
     $scope.user = AuthService.getUser()
 
     if ($scope.user !== "") {
